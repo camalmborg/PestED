@@ -24,50 +24,50 @@ SEM <- function(X, params, inputs, pest=c(0,0,0,1,0), timestep=1800){
   ### Hydrology ###
   
   ## evaporation (patch)
-  EVAP = min(X[6]/timestep,1.15*params$gevap*(0.622*inputs$VPD/P)/1000)  ##Bonan Eqn 13.10: rate = m/s
-                                                     ## 1.15 kg/m3 = rho = density of air
-                                                     ## 1000 at end converts kg/m2/s to m/s
+  EVAP = min(X[6] / timestep, 1.15 * params$gevap * (0.622 * inputs$VPD / P) / 1000)  # Bonan Eqn 13.10: rate = m/s
+                                                     # 1.15 kg/m3 = rho = density of air
+                                                     # 1000 at end converts kg/m2/s to m/s
   ##**** CHECK UNITS (want m/s)
-  X[6] = X[6] + inputs$precip/1000 - EVAP*timestep
+  X[6] = X[6] + inputs$precip/1000 - EVAP*timestep  # CM: what is going on here?
   
   ## plant available water (trapazoidal response) (patch)
-  paw = ifelse(X[6]>params$Wthresh,X[6]-0.5*params$Wthresh,
-               0.5*X[6]*X[6]/params$Wthresh)
-  supply = (1-pest[2])*params$Kroot*X[3]*paw*X[7] ## potential rate of water uptake, umol/m2Ground/s
+  paw = ifelse(X[6] > params$Wthresh,X [6] - 0.5*params$Wthresh,
+               0.5 * X[6] * X[6] / params$Wthresh)
+  supply = (1 - pest[2]) * params$Kroot * X[3] * paw * X[7] # potential rate of water uptake, umol/m2Ground/s
     
   ### turnover (tree)  ###
-  leafLitter = X[1]*min(1,params$leafLitter+pest[3])
-  CWD        = X[2]*params$CWD
-  rootLitter = X[3]*pest[4]*params$rootLitter
+  leafLitter = X[1] * min(1, params$leafLitter + pest[3])
+  CWD        = X[2] * params$CWD
+  rootLitter = X[3] * pest[4] * params$rootLitter
   X[1] = X[1] - leafLitter
   X[2] = X[2] - CWD
   X[3] = X[3] - rootLitter
   
   
   ## Leaf Respiration (m2 leaf)
-  Rleaf = arrhenius(params$Rleaf,inputs$temp)   # umol/m2/sec
+  Rleaf = arrhenius(params$Rleaf, inputs$temp)   # umol/m2/sec
   
   ## LAI & Canopy Optics (patch)
-  LAI = X[1]*params$SLA*(X[7]/10000)  ## m2/m2
-  PARmid = (1-0.5* exp(-0.5*LAI))*inputs$PAR  ## estimate mid-canopy PAR,  umol/m2/sec
+  LAI = X[1] * params$SLA * (X[7]/10000)  ## m2/m2
+  PARmid = (1-0.5 * exp(-0.5*LAI)) * inputs$PAR  ## estimate mid-canopy PAR,  umol/m2/sec
 
   ## photosynthesis & Transpiration (plot)
   Ags = c(0,0)
-  if(inputs$PAR>1e-20){
+  if(inputs$PAR > 1e-20){
     Ags = solve.FVcB(arrhenius(params$Vcmax,inputs$temp),
                      arrhenius(params$Jmax,inputs$temp),
                      Rleaf,
-                     42.75*exp(37830*(inputs$temp+273.15 - 298)/(298*R*(inputs$temp+273.15))), ## Gamma star
+                     42.75 * exp(37830*(inputs$temp + 273.15 - 298)/(298*R*(inputs$temp + 273.15))), ## Gamma star
                      params$alpha, ## quantum yield
                      params$m,     ## stomatal slope
                      params$g0,    ## cuticular conductance
                      inputs$VPD,
                      PARmid)
-    demand = max(Ags[2]*0.622*inputs$VPD/P*LAI*1e6,1e-10)     ## transpiration without water limitation, umol/m2/s
-    fopen = max(0,min(1,supply/demand))
-    GPP = (Ags[1]+Rleaf)*fopen*LAI               # umol/m2/sec
-    TRANSP = demand*fopen                        # umol/m2/sec
-    X[6] = X[6] - TRANSP*timestep*kH2O
+    demand = max(Ags[2] * 0.622 * inputs$VPD/P * LAI * 1e6,1e-10)     ## transpiration without water limitation, umol/m2/s
+    fopen = max(0,min(1, supply / demand))
+    GPP = (Ags[1] + Rleaf) * fopen * LAI               # umol/m2/sec
+    TRANSP = demand * fopen                        # umol/m2/sec
+    X[6] = X[6] - TRANSP * timestep * kH2O
   } else {
     fopen = GPP = TRANSP = 0
   }
@@ -86,17 +86,17 @@ SEM <- function(X, params, inputs, pest=c(0,0,0,1,0), timestep=1800){
   ###### respiration & allocation ########
 
   ## maintainence respiration (priority #2) (umol/s/tree)
-  GPP = GPP*10000/X[7]
-  Rleaf = Rleaf*LAI*10000/X[7]
-  Rstem = X[2]*arrhenius(params$Rstem,inputs$temp)
-  Rroot = X[3]*arrhenius(params$Rroot,inputs$temp)
+  GPP = GPP * 10000 / X[7]
+  Rleaf = Rleaf * LAI * 10000 / X[7]
+  Rstem = X[2] * arrhenius(params$Rstem, inputs$temp)
+  Rroot = X[3] * arrhenius(params$Rroot, inputs$temp)
   Rg = 0  ## growth respiration: kg per plant per timestep
   
   ## update storage for priorities 1 & 2 (kg/tree) 
   X[4] = X[4] + ((1-pest[1])*(GPP - Rleaf) - Rstem - Rroot)*ktree*timestep
 
   ## calculate allometric potentials
-  DBH = (X[2]/params$allomB0)^(1/params$allomB1)  ## infer DBH from woody biomas
+  DBH = (X[2] / params$allomB0)^(1 / params$allomB1)  ## infer DBH from woody biomass
   Lmax = params$allomL0*DBH^params$allomL1        ## set maximum leaf biomass from DBH
   Lmin = params$Lmin*Lmax                         ## set minimum leaf and root biomass as a fraction of maximum
   Rmin = Lmin*params$q
@@ -187,19 +187,19 @@ farquhar = function(Ci,Fparams,I){
 ballberry = function(input,BBparams,Fparams,obs){
   ## is actually the Medlyn et al 2011 model
   Ci <- obs[1] - 1.6*input[1]/input[2]
-  e1 <- (farquhar(Ci,Fparams,obs[3]) - input[1])
+  e1 <- (farquhar(Ci, Fparams, obs[3]) - input[1])
 #  e2 <- (BBparams[1] + (1+BBparams[2]/sqrt(obs[2]))*input[1]/obs[1] - input[2])*100
   e2 <- (BBparams[1] + BBparams[2]*input[1]/((obs[1]-Fparams[4])*(1+obs[2])) - input[2])*100  
   return(e1^2 + e2^2)
 }
 
 
-solve.FVcB = function(Vcmax, Jmax, Rleaf, Gstar, alpha, m, g0,VPD,PAR){
+solve.FVcB = function(Vcmax, Jmax, Rleaf, Gstar, alpha, m, g0, VPD, PAR){
   Ca = 400
   out <- optim(c(15, 0.1),			# solve simultaneously for An.pred and gs.pred
                ballberry,
                BBparams = c(g0,m),	        # Ballberry params                                                                                                                                                                                                                                                                                                            
-               Fparams = c(Vcmax,Jmax,Rleaf,Gstar,alpha),	# Farquhar params
+               Fparams = c(Vcmax, Jmax, Rleaf, Gstar, alpha),	# Farquhar params
                obs = c(Ca, VPD, PAR))  			# data
   if(out$par[2]>=0){
     return(out$par)
@@ -262,9 +262,9 @@ arrhenius <- function(observed.value, new.temp, old.temp = 25){
   
 ## initialize state variables
 DBH = 10
-X = rep(1,7)
-X[1] = X[3] = X[4] = params$allomL0*DBH^params$allomL1 
-X[2] = params$allomB0*DBH^params$allomB1 
+X = rep(1, 7)
+X[1] = X[3] = X[4] = params$allomL0 * DBH^params$allomL1 
+X[2] = params$allomB0 * DBH^params$allomB1 
 X[5] = 10
 X[7] = 700
 
@@ -304,8 +304,8 @@ iterate.SEM <- function(pest, t.start = 7000, years = 1){
     }  
     
     ti = (t-1) %% nrow(inputs) + 1  ## indexing to allow met to loop
-    output[t,]=SEM(X,params,inputs[ti,],pest)
-    X = output[t,1:7]
+    output[t,] = SEM(X, params, inputs[ti,], pest)
+    X = output[t, 1:7]
     if((t %% (48*7)) == 0) print(t/48) ## day counter
     if(X[7] == 0) break
   }
@@ -331,7 +331,7 @@ if(FALSE){
 default = iterate.SEM(c(0,0,0,1,0))
 plot.SEM(default)
 
-defol = iterate.SEM(c(0,0,1,1,0))  ## assume a one-time 100% defoliation
+defol = iterate.SEM(c(0,0,1,1,0), years = 4)  ## assume a one-time 100% defoliation
 plot.SEM(defol)
 plot.SEM(default-defol)
 
@@ -376,3 +376,4 @@ plot(DBH)
 inc = DBH[length(DBH)]-DBH[1]
 inc
 }
+
