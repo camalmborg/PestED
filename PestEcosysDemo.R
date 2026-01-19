@@ -6,14 +6,14 @@ kH2O = 1e-6*18*10^-6 #mol/umol*gH2O/mol*m/g
 P = 101.325 ## average atm pressure (kPa)
 
 ##' Simple Ecosystem Model
-##' @param X = [leaf,wood,root,storage,som,SoilWater,stem density]
+##' @param X = [leaf, wood, root, storage, SOM, soil water, stem density]
 ##' @param params
 ##' @param timestep is in seconds, defaults to 30 min
 ##' @param inputs: PAR, temp, VPD
 ##' @param pest [phloem, xylem, leaf, root, stem]
 ##' @author Michael C, Dietze <dietze@bu.edu>
 ##' @return X 
-SEM <- function(X,params,inputs,pest=c(0,0,0,1,0),timestep=1800){ 
+SEM <- function(X, params, inputs, pest=c(0,0,0,1,0), timestep=1800){ 
   ## pest impacts:
   ## phloem feaders: % tax flux of carbon out of (GPP-Rl) and into Bstore
   ## xylem disrupters (bark beetle, canker, wilt, girdling): % decrease water supply 
@@ -270,16 +270,15 @@ X[7] = 700
 
 
 if(!exists('inputs')){
-  library(ncdf)
-  met = open.ncdf("AMF_USMe2_2005_L2_GF_V006.nc")
-  print.ncdf(met)
-  PAR = get.var.ncdf(met,"PAR")
+  library(ncdf4)
+  met = nc_open("AMF_USMe2_2005_L2_GF_V006.nc")
+  PAR = ncvar_get(met, "PAR")
   for(i in which(PAR < -10)){PAR[i]=PAR[i-1]} ##uber-naive gapfilling
-  temp = get.var.ncdf(met,"TA")
-  VPD  = get.var.ncdf(met,"VPD")
-  precip = get.var.ncdf(met,"PREC")
-  time = get.var.ncdf(met,"DOY")
-  close.ncdf(met)
+  temp = ncvar_get(met, "TA")
+  VPD  = ncvar_get(met, "VPD")
+  precip = ncvar_get(met,"PREC")
+  time = ncvar_get(met,"DOY")
+  nc_close(met)
   plot(PAR,type='l')
   plot(temp,type='l')
   plot(VPD,type='l')  
@@ -290,7 +289,7 @@ if(!exists('inputs')){
 varnames <- c("Bleaf","Bwood","Broot","Bstore","BSOM","Water","density","GPP","fopen","Rleaf","RstemRroot","Rgrow")
 units <- c("kg/plant","kg/plant","kg/plant","kg/plant","Mg/ha","m","stems/ha")
 
-iterate.SEM <- function(pest,t.start = 7000,years = 1){
+iterate.SEM <- function(pest, t.start = 7000, years = 1){
   
   pest.orig = pest
   pest = c(0,0,0,1,0)
@@ -332,7 +331,7 @@ if(FALSE){
 default = iterate.SEM(c(0,0,0,1,0))
 plot.SEM(default)
 
-defol   = iterate.SEM(c(0,0,1,1,0))  ## assume a one-time 100% defoliation
+defol = iterate.SEM(c(0,0,1,1,0))  ## assume a one-time 100% defoliation
 plot.SEM(defol)
 plot.SEM(default-defol)
 
@@ -343,7 +342,7 @@ plot.SEM(default-beetle)
 1-apply(default,2,min)/apply(default,2,max)
 1-apply(defol,2,min)/apply(defol,2,max)
 
-L4 = read.csv("AMF_USMe2_2005_L4_h_V002.txt",header=TRUE,na.strings="-9999")
+L4 = read.csv("AMF_USMe2_2005_L4_h_V002.txt", header=TRUE, na.strings="-9999")
 L4[L4==-9999] = NA
 
 default = as.data.frame(default)
@@ -356,19 +355,19 @@ plot(GPP,L4$GPP_st_MDS,pch=".")
 mean(GPP)/mean(L4$GPP_st_MDS)
 
 ## GPP Diurnal
-GPP.mod.diurnal  = tapply(GPP,L4$Hour,mean)
-GPP.obs.diurnal = tapply(L4$GPP_st_MDS,L4$Hour,mean)
-ylim=range(c(GPP.mod.diurnal,GPP.obs.diurnal))
+GPP.mod.diurnal  = tapply(GPP, L4$Hour, mean)
+GPP.obs.diurnal = tapply(L4$GPP_st_MDS, L4$Hour,mean)
+ylim=range(c(GPP.mod.diurnal, GPP.obs.diurnal))
 tod = sort(unique(L4$Hour))
-plot(tod,GPP.mod.diurnal,ylim=ylim,col=2,xlab="Time of Day",ylab='GPP',main="Diurnal Cycle",type='l',lwd=3)
-lines(tod,GPP.obs.diurnal,lwd=3)
-legend("topleft",legend=c("obs","mod"),col=1:2,pch=20,cex=0.75)
+plot(tod,GPP.mod.diurnal, ylim=ylim, col=2, xlab="Time of Day", ylab='GPP', main="Diurnal Cycle", type='l', lwd=3)
+lines(tod, GPP.obs.diurnal, lwd=3)
+legend("topleft", legend=c("obs","mod"), col=1:2, pch=20, cex=0.75)
 
 ## RA & NPP (umol/sec/tree)
 RA = default$Rleaf + default$RstemRroot + default$Rgrow
 NPP = default[,8] - RA
 mean(NPP)/mean(default[,8])
-Rplant = apply(default[,c("Rleaf","RstemRroot","Rgrow")],2,mean)
+Rplant = apply(default[,c("Rleaf", "RstemRroot", "Rgrow")], 2, mean)
 Rplant/sum(Rplant)
 
 ## woody increment
@@ -376,5 +375,4 @@ DBH = (default$Bwood/params$allomB0)^(1/params$allomB1)  ## infer DBH from woody
 plot(DBH)
 inc = DBH[length(DBH)]-DBH[1]
 inc
-
 }
