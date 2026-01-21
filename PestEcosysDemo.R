@@ -28,7 +28,7 @@ SEM <- function(X, params, inputs, pest=c(0,0,0,1,0), timestep=1800){
                                                      # 1.15 kg/m3 = rho = density of air
                                                      # 1000 at end converts kg/m2/s to m/s
   ##**** CHECK UNITS (want m/s)
-  X[6] = X[6] + inputs$precip/1000 - EVAP*timestep  # CM: what is going on here?
+  X[6] = X[6] + inputs$precip/1000 - EVAP*timestep  
   
   ## plant available water (trapazoidal response) (patch)
   paw = ifelse(X[6] > params$Wthresh,X [6] - 0.5*params$Wthresh,
