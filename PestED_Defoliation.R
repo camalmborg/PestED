@@ -38,12 +38,14 @@ SEM <- function(X, params, inputs, pest, timestep=1800){
   supply = (1 - pest[2]) * params$Kroot * X[3] * paw * X[7] # potential rate of water uptake, umol/m2Ground/s
   
   ### turnover (tree)  ###
-  leafLitter = X[1] * min(1, params$leafLitter + pest[3])
+  leafLitter = X[1] * min(1, params$leafLitter + max(0,pest[3] - params$defenseEfficiency*X[8])) # not defoliating over 100%
   CWD        = X[2] * params$CWD
   rootLitter = X[3] * pest[4] * params$rootLitter
+  defenseLoss = min(X[8], X[8]*params$defenseBreakdown + leafLitter/X[1]*X[8]) ## chemical turnover + litter loss (no translocation)
   X[1] = X[1] - leafLitter
   X[2] = X[2] - CWD
   X[3] = X[3] - rootLitter
+  X[8] = X[8] - defenseLoss
   
   
   ## Leaf Respiration (m2 leaf)
@@ -122,6 +124,13 @@ SEM <- function(X, params, inputs, pest, timestep=1800){
       X[3] = X[3] + rootAlloc
       X[4] = X[4] - rootAlloc*(1+params$Rg)
       Rg   = Rg   + rootAlloc*params$Rg
+    }
+    
+    ## Defense
+    if(X[4] > 0) {
+      defenseAlloc = params$defenseAlloc * X[4]
+      X[4] = X[4] - defenseAlloc
+      X[8] = X[8] + defenseAlloc
     }
     
     ## priority #5, maximum storage
@@ -233,10 +242,14 @@ params$Jmax  = params$Vcmax*1.67
 params$m     = 4
 params$g0    = 0
 ##allometry
-params$allomB0 = exp(-2.5355)/0.8  ## Jenkins 2004, Pine, adj for BGB
-params$allomB1 = 2.4349
-params$allomL0 = exp(-2.907)  ##Jenkins full database softwoods, Table 3
-params$allomL1 = 1.674
+#params$allomB0 = exp(-2.5355)/0.8  ## Jenkins 2004, Pine, adj for BGB
+#params$allomB1 = 2.4349
+#params$allomL0 = exp(-2.907)  ##Jenkins full database softwoods, Table 3
+#params$allomL1 = 1.674
+params$allomB0 = exp(-2.134)/0.8 ## Jenkins for aspen/softwoods
+params$allomB1 = 2.530
+params$allomL0 = exp(-4.556)
+params$allomL1 = 2.354
 ## plant respiration
 params$Rleaf = 0.04*params$Vcmax
 params$Rroot = 1.2
@@ -261,6 +274,12 @@ params$Smax = 1
 params$Rfrac = 0.2
 params$SeedlingMort = 0.99
 params$Kleaf = (1/21/48)/2^2.5  ## assumes it takes 21 days to regrow at 25C
+## Defense
+#params$defenseBreakdown = 1/172800*timestep
+#params$defenseBreakdown = 1/365/86400*timestep
+params$defenseBreakdown = 0.0005
+params$defenseAlloc = 0.10
+params$defenseEfficiency = 1
 
 ## initialize state variables
 DBH = 10
@@ -269,7 +288,7 @@ X[1] = X[3] = X[4] = params$allomL0 * DBH^params$allomL1
 X[2] = params$allomB0 * DBH^params$allomB1 
 X[5] = 10
 X[7] = 700
-#X[8] = 0.1  # 10% of the storage budget
+X[8] = X[4]*0.1 # 10% of the storage budget
 
 
 if(!exists('inputs')){
@@ -289,15 +308,15 @@ if(!exists('inputs')){
   inputs = data.frame(PAR = PAR, temp = temp, VPD = VPD, precip = precip)    
 } 
 
-varnames <- c("Bleaf","Bwood","Broot","Bstore","BSOM","Water","density","GPP","fopen","Rleaf","RstemRroot","Rgrow")  # might have to add a defense budget here?
-units <- c("kg/plant","kg/plant","kg/plant","kg/plant","Mg/ha","m","stems/ha")
+varnames <- c("Bleaf","Bwood","Broot","Bstore","BSOM","Water","density","Bdefense","GPP","fopen","Rleaf","RstemRroot","Rgrow")  # might have to add a defense budget here?
+units <- c("kg/plant","kg/plant","kg/plant","kg/plant","Mg/ha","m","stems/ha","kg/plant")
 
-iterate.SEM <- function(pest, t.start = 7000, years = 5){
+iterate.SEM <- function(pest, t.start = 7000, years = 2){
   
   pest.orig = pest
   #pest = c(0,0,1,1,0)
   nt = length(time)*years
-  output = array(NA,c(nt,12))
+  output = array(NA,c(nt,13))
   for(t in 1:nt){
     ## turn pests on/off
     if(t %in% t.start){
@@ -308,7 +327,7 @@ iterate.SEM <- function(pest, t.start = 7000, years = 5){
     
     ti = (t-1) %% nrow(inputs) + 1  ## indexing to allow met to loop
     output[t,] = SEM(X, params, inputs[ti,], pest)
-    X = output[t, 1:7]
+    X = output[t, 1:8]
     if((t %% (48*7)) == 0) print(t/48) ## day counter
     if(X[7] == 0) break
   }
@@ -321,7 +340,7 @@ iterate.SEM <- function(pest, t.start = 7000, years = 5){
 plot.SEM <- function(output){
   output = as.data.frame(output)
   for(i in 1:ncol(output)){
-    if(i<=7){
+    if(i<=8){
       plot(output[,i],type='l',main=varnames[i],ylab=units[i])
     }else{
       plot(tapply(output[,i],rep(1:366,each=48)[1:nrow(output)],mean),main=varnames[i],type='l')
@@ -331,10 +350,10 @@ plot.SEM <- function(output){
 
 if(FALSE){
   
-  default = iterate.SEM(c(0,0,0,1,0))
+  default = iterate.SEM(c(0,0,0,1,0), years = 2)
   plot.SEM(default)
   
-  defol = iterate.SEM(c(0,0,1,1,0), years = 4)  ## assume a one-time 100% defoliation
+  defol = iterate.SEM(c(0,0,1,1,0), years = 2)  ## assume a one-time 100% defoliation
   plot.SEM(defol)
   plot.SEM(default-defol)
   
@@ -352,7 +371,9 @@ if(FALSE){
   points(L4$GPP_st_MDS,pch=".",col=2)
   plot(GPP,L4$GPP_st_MDS,pch=".")
   mean(GPP)/mean(L4$GPP_st_MDS)
-  
+  # plot(default[,8]/default[,1]) # biomass defense/biomass leaf
+  # plot(default[,8]/(default[,1]+default[,8]) # biomass defense/biomass leaf + biomass defense (total leaf biomass)
+  # 
   ## GPP Diurnal
   GPP.mod.diurnal  = tapply(GPP, L4$Hour, mean)
   GPP.obs.diurnal = tapply(L4$GPP_st_MDS, L4$Hour,mean)
