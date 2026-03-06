@@ -278,9 +278,11 @@ params$Rfrac = 0.2
 params$SeedlingMort = 0.99
 params$Kleaf = (1/21/48)/2^2.5  ## assumes it takes 21 days to regrow at 25C
 ## Defense
-# params$defenseBreakdown = 0.0366/84600*timestep
-# params$defenseAlloc = 0.00005 ##0.1/365/84600*timestep
-# params$defenseEfficiency = 1
+#params$defenseBreakdown = 0.0366/84600*timestep
+#params$defenseAlloc = 0.00005 ##0.1/365/84600*timestep
+params$defenseBreakdown = 0
+params$defenseAlloc = 0
+params$defenseEfficiency = 1
 
 ## initialize state variables
 DBH = 10
@@ -302,10 +304,10 @@ if(!exists('inputs')){
   precip = ncvar_get(met,"PREC")
   time = ncvar_get(met,"DOY")
   nc_close(met)
-  plot(PAR,type='l')
-  plot(temp,type='l')
-  plot(VPD,type='l')  
-  plot(precip,type='l')  
+  # plot(PAR,type='l')
+  # plot(temp,type='l')
+  # plot(VPD,type='l')  
+  # plot(precip,type='l')  
   inputs = data.frame(PAR = PAR, temp = temp, VPD = VPD, precip = precip)    
 } 
 
