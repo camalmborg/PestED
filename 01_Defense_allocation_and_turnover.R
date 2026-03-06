@@ -28,7 +28,6 @@ for (i in 1:length(alloc_spread)){
   for (j in 1:length(turnover_spread)){
     params$defenseBreakdown = turnover_spread[j]
     # save param values:
-    param_values[i,j] <- paste0(as.character(params$defenseAlloc), "_", as.character(params$defenseBreakdown))
     # run default (no defoliation case):
     default <- iterate.SEM(c(0,0,0,0,1,0), years = 5)
     mean_def_biomass[i,j] <- (mean(default[,"Bdefense"]/(default[,"Bdefense"] + default[,"Bleaf"]), na.rm = TRUE))*100
