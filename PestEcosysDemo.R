@@ -292,7 +292,7 @@ units <- c("kg/plant","kg/plant","kg/plant","kg/plant","Mg/ha","m","stems/ha")
 iterate.SEM <- function(pest, t.start = 7000, years = 1){
   
   pest.orig = pest
-  pest = c(0,0,0,1,0)
+  #pest = c(0,0,0,1,0)
   nt = length(time)*years
   output = array(NA,c(nt,12))
   for(t in 1:nt){
@@ -328,10 +328,10 @@ plot.SEM <- function(output){
 
 if(FALSE){
   
-default = iterate.SEM(c(0,0,0,1,0))
+default = iterate.SEM(c(0,0,0,1,0), years = 3)
 plot.SEM(default)
 
-defol = iterate.SEM(c(0,0,1,1,0), years = 4)  ## assume a one-time 100% defoliation
+defol = iterate.SEM(c(0,0,1,1,0), years = 3)  ## assume a one-time 100% defoliation
 plot.SEM(defol)
 plot.SEM(default-defol)
 
