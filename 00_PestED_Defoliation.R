@@ -278,8 +278,8 @@ params$Rfrac = 0.2
 params$SeedlingMort = 0.99
 params$Kleaf = (1/21/48)/2^2.5  ## assumes it takes 21 days to regrow at 25C
 ## Defense
-#params$defenseBreakdown = 0.0366/84600*timestep
-#params$defenseAlloc = 0.00005 ##0.1/365/84600*timestep
+#params$defenseBreakdown = 0.0061/86400*timestep
+#params$defenseAlloc = 0.00011416 ##0.1/365/84600*timestep
 params$defenseBreakdown = 0
 params$defenseAlloc = 0
 params$defenseEfficiency = 1
@@ -351,57 +351,57 @@ plot.SEM <- function(output){
   }
 }
 
-# if(FALSE){
-#   
-#   default = iterate.SEM(c(0,0,0,1,0), years = 4)
-#   plot.SEM(default)
-#   check <- default[,"Bdefense"]/(default[,"Bdefense"] + default[,"Bleaf"])
-#   plot(check)
-#   
-#   defol = iterate.SEM(c(0,0,1,1,0), years = 4)  ## assume a one-time 100% defoliation
-#   plot.SEM(defol)
-#   check <- defol[,"Bdefense"]/(defol[,"Bdefense"] + defol[,"Bleaf"])
-#   plot(check)
-#   
-#   plot.SEM(default-defol)
-#   
-#   1-apply(default,2,min)/apply(default,2,max)
-#   1-apply(defol,2,min)/apply(defol,2,max)
-#   
-#   L4 = read.csv("AMF_USMe2_2005_L4_h_V002.txt", header=TRUE, na.strings="-9999")
-#   L4[L4==-9999] = NA
-#   
-#   default = as.data.frame(default)
-#   
-#   ## GPP: model and observed
-#   GPP = default[,8]*default[,7]/10000  ## convert back to umol/m2/sec to compart to tower
-#   plot(GPP,type='l')
-#   points(L4$GPP_st_MDS,pch=".",col=2)
-#   plot(GPP,L4$GPP_st_MDS,pch=".")
-#   mean(GPP)/mean(L4$GPP_st_MDS)
-#   # plot(default[,8]/default[,1]) # biomass defense/biomass leaf
-#   # plot(default[,8]/(default[,1]+default[,8]) # biomass defense/biomass leaf + biomass defense (total leaf biomass)
-#   # 
-#   ## GPP Diurnal
-#   GPP.mod.diurnal  = tapply(GPP, L4$Hour, mean)
-#   GPP.obs.diurnal = tapply(L4$GPP_st_MDS, L4$Hour,mean)
-#   ylim=range(c(GPP.mod.diurnal, GPP.obs.diurnal))
-#   tod = sort(unique(L4$Hour))
-#   plot(tod,GPP.mod.diurnal, ylim=ylim, col=2, xlab="Time of Day", ylab='GPP', main="Diurnal Cycle", type='l', lwd=3)
-#   lines(tod, GPP.obs.diurnal, lwd=3)
-#   legend("topleft", legend=c("obs","mod"), col=1:2, pch=20, cex=0.75)
-#   
-#   ## RA & NPP (umol/sec/tree)
-#   RA = default$Rleaf + default$RstemRroot + default$Rgrow
-#   NPP = default[,8] - RA
-#   mean(NPP)/mean(default[,8])
-#   Rplant = apply(default[,c("Rleaf", "RstemRroot", "Rgrow")], 2, mean)
-#   Rplant/sum(Rplant)
-#   
-#   ## woody increment
-#   DBH = (default$Bwood/params$allomB0)^(1/params$allomB1)  ## infer DBH from woody biomas
-#   plot(DBH)
-#   inc = DBH[length(DBH)]-DBH[1]
-#   inc
-# }
+if(FALSE){
+
+  default = iterate.SEM(c(0,0,0,1,0), years = 4)
+  plot.SEM(default)
+  check <- default[,"Bdefense"]/(default[,"Bdefense"] + default[,"Bleaf"])
+  plot(check)
+
+  defol = iterate.SEM(c(0,0,1,1,0), years = 4)  ## assume a one-time 100% defoliation
+  plot.SEM(defol)
+  check <- defol[,"Bdefense"]/(defol[,"Bdefense"] + defol[,"Bleaf"])
+  plot(check)
+
+  plot.SEM(default-defol)
+
+  1-apply(default,2,min)/apply(default,2,max)
+  1-apply(defol,2,min)/apply(defol,2,max)
+
+  L4 = read.csv("AMF_USMe2_2005_L4_h_V002.txt", header=TRUE, na.strings="-9999")
+  L4[L4==-9999] = NA
+
+  default = as.data.frame(default)
+
+  ## GPP: model and observed
+  GPP = default[,8]*default[,7]/10000  ## convert back to umol/m2/sec to compart to tower
+  plot(GPP,type='l')
+  points(L4$GPP_st_MDS,pch=".",col=2)
+  plot(GPP,L4$GPP_st_MDS,pch=".")
+  mean(GPP)/mean(L4$GPP_st_MDS)
+  # plot(default[,8]/default[,1]) # biomass defense/biomass leaf
+  # plot(default[,8]/(default[,1]+default[,8]) # biomass defense/biomass leaf + biomass defense (total leaf biomass)
+  #
+  ## GPP Diurnal
+  GPP.mod.diurnal  = tapply(GPP, L4$Hour, mean)
+  GPP.obs.diurnal = tapply(L4$GPP_st_MDS, L4$Hour,mean)
+  ylim=range(c(GPP.mod.diurnal, GPP.obs.diurnal))
+  tod = sort(unique(L4$Hour))
+  plot(tod,GPP.mod.diurnal, ylim=ylim, col=2, xlab="Time of Day", ylab='GPP', main="Diurnal Cycle", type='l', lwd=3)
+  lines(tod, GPP.obs.diurnal, lwd=3)
+  legend("topleft", legend=c("obs","mod"), col=1:2, pch=20, cex=0.75)
+
+  ## RA & NPP (umol/sec/tree)
+  RA = default$Rleaf + default$RstemRroot + default$Rgrow
+  NPP = default[,8] - RA
+  mean(NPP)/mean(default[,8])
+  Rplant = apply(default[,c("Rleaf", "RstemRroot", "Rgrow")], 2, mean)
+  Rplant/sum(Rplant)
+
+  ## woody increment
+  DBH = (default$Bwood/params$allomB0)^(1/params$allomB1)  ## infer DBH from woody biomas
+  plot(DBH)
+  inc = DBH[length(DBH)]-DBH[1]
+  inc
+}
 
