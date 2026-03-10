@@ -127,3 +127,8 @@ min_Bstore <- read.csv("/projectnb/dietzelab/malmborg/Ch3_PestDefense/min_store_
   slice(-1) |>
   select(-1)
 
+# allocation values:
+alloc_estimate <- alloc_spread[5:21]
+turnover_estimate <- turnover_spread[2:7]
+  
+  

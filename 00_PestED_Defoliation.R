@@ -278,10 +278,10 @@ params$Rfrac = 0.2
 params$SeedlingMort = 0.99
 params$Kleaf = (1/21/48)/2^2.5  ## assumes it takes 21 days to regrow at 25C
 ## Defense
-#params$defenseBreakdown = 0.0061/86400*timestep
-#params$defenseAlloc = 0.00011416 ##0.1/365/84600*timestep
-params$defenseBreakdown = 0
-params$defenseAlloc = 0
+#params$defenseBreakdown = 0
+#params$defenseAlloc = 0
+#params$defenseBreakdown = turnover_estimate[2]/86400*timestep
+#params$defenseAlloc = alloc_estimate[8]
 params$defenseEfficiency = 1
 
 ## initialize state variables
