@@ -53,13 +53,31 @@ write.csv(min_store_biomass, file = "/projectnb/dietzelab/malmborg/Ch3_PestDefen
 
 
 
-# ## Check out results and view heat map
-# # load superheat library:
-# library(dplyr)
-# library(superheat)
-# # load the csv of allocation/turnover tests:
-# alloc_turn <- read.csv("/projectnb/dietzelab/malmborg/Ch3_PestDefense/mean_def_biomass_percentages_alloc_turnover.csv", row.names = 1) |>
-#   mutate(across(where(is.numeric), ~ .x * 100))
-#   mutate(across(where(is.numeric), ~round(., digits = 3)))
+## Check out results and view heat map
+# load superheat library:
+library(dplyr)
+library(superheat)
+# load the csv of allocation/turnover tests:
+alloc_turn <- read.csv("/projectnb/dietzelab/malmborg/Ch3_PestDefense/mean_def_biomass_alloc_turnover.csv", row.names = 1) |>
+  # multiply by 100 to show mean defense chemistry in percentage of leaf biomass:
+  mutate(across(where(is.numeric), ~ .x * 100)) |>
+  # round for nicer display:
+  mutate(across(where(is.numeric), ~round(., digits = 3))) |>
+  # remove 0 allocation row:
+  slice(-1)
 
+# renaming columns and rows:
+colnames(alloc_turn) <- as.character(seq_along())
+
+# values for color scaling in heatmap
+vals <- c(0, 3, 5, 15, 20, 25, 50)
+vals_scaled <- (vals - min(vals)) / (max(vals) - min(vals))
+
+# make heatmap:
+superheat(alloc_turn,
+          X.text = as.matrix(round(alloc_turn, 2)),
+          X.text.size = 4,
+          #scale = TRUE,
+          heat.pal = c("red4", "red","pink1", "white","lightblue1", "skyblue1","dodgerblue2"),
+          heat.pal.values = vals_scaled)
 
