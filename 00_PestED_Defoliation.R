@@ -126,12 +126,12 @@ SEM <- function(X, params, inputs, pest, timestep = 1800){
       Rg   = Rg   + rootAlloc*params$Rg
     }
     
-    ## Defense
-    if(X[4] > 0) {
-      defenseAlloc = params$defenseAlloc * X[4]
-      X[4] = X[4] - defenseAlloc
-      X[8] = X[8] + defenseAlloc
-    }
+    # ## Defense
+    # if(X[4] > 0) {
+    #   defenseAlloc = params$defenseAlloc * X[4]
+    #   X[4] = X[4] - defenseAlloc
+    #   X[8] = X[8] + defenseAlloc
+    # }
     
     ## priority #5, maximum storage
     if(X[4] > Smax){
@@ -167,6 +167,13 @@ SEM <- function(X, params, inputs, pest, timestep = 1800){
         X[5] = X[5] + reproAlloc*params$SeedlingMort  ## bulk of reproductive allocation dies
         X[7] = X[7] + reproAlloc*(1-params$SeedlingMort)*X[7]/sum(X[1:4]) ## naive reproduction (new trees enter as adults)
         Rg = Rg + growAlloc*params$Rg
+      }
+      
+      ## Defense
+      if(X[4] > 0) {
+        defenseAlloc = params$defenseAlloc * X[4]
+        X[4] = X[4] - defenseAlloc
+        X[8] = X[8] + defenseAlloc
       }
       
     }  ## end Store > Smax
@@ -280,8 +287,8 @@ params$Kleaf = (1/21/48)/2^2.5  ## assumes it takes 21 days to regrow at 25C
 ## Defense
 #params$defenseBreakdown = 0
 #params$defenseAlloc = 0
-#params$defenseBreakdown = turnover_estimate[2]/86400*timestep
-#params$defenseAlloc = alloc_estimate[8]
+params$defenseBreakdown = turnover_estimate[2]/86400*timestep
+params$defenseAlloc = alloc_estimate[17]
 params$defenseEfficiency = 1
 
 ## initialize state variables
@@ -353,12 +360,12 @@ plot.SEM <- function(output){
 
 if(FALSE){
 
-  default = iterate.SEM(c(0,0,0,1,0), years = 4)
+  default = iterate.SEM(c(0,0,0,1,0), years = 3)
   plot.SEM(default)
   check <- default[,"Bdefense"]/(default[,"Bdefense"] + default[,"Bleaf"])
   plot(check)
 
-  defol = iterate.SEM(c(0,0,1,1,0), years = 4)  ## assume a one-time 100% defoliation
+  defol = iterate.SEM(c(0,0,1,1,0), years = 3)  ## assume a one-time 100% defoliation
   plot.SEM(defol)
   check <- defol[,"Bdefense"]/(defol[,"Bdefense"] + defol[,"Bleaf"])
   plot(check)
