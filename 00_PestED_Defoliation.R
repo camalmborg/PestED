@@ -15,7 +15,7 @@ P = 101.325 ## average atm pressure (kPa)
 ##' @param pest [phloem, xylem, leaf, root, stem]
 ##' @author Michael C, Dietze <dietze@bu.edu>
 ##' @return X 
-SEM <- function(X, params, inputs, pest, timestep = 1800){ 
+SEM <- function(X, params, inputs, pest, timestep = 1800, defense){ 
   ## pest impacts:
   ## phloem feeders: % tax flux of carbon out of (GPP-Rl) and into Bstore
   ## xylem disruptors (bark beetle, canker, wilt, girdling): % decrease water supply 
@@ -126,12 +126,14 @@ SEM <- function(X, params, inputs, pest, timestep = 1800){
       Rg   = Rg   + rootAlloc*params$Rg
     }
     
-    # ## Defense
-    # if(X[4] > 0) {
-    #   defenseAlloc = params$defenseAlloc * X[4]
-    #   X[4] = X[4] - defenseAlloc
-    #   X[8] = X[8] + defenseAlloc
-    # }
+    ## Defense priority after minimum leaf and root
+    if(defense == 1){
+      if(X[4] > 0) {
+        defenseAlloc = params$defenseAlloc * X[4]
+        X[4] = X[4] - defenseAlloc
+        X[8] = X[8] + defenseAlloc
+      }
+    }
     
     ## priority #5, maximum storage
     if(X[4] > Smax){
@@ -150,12 +152,13 @@ SEM <- function(X, params, inputs, pest, timestep = 1800){
         Rg = Rg + (leafAlloc+rootAlloc)*params$Rg
       }
       
-      # ## Defense
-      # if(X[4] > 0) {
-      #   defenseAlloc = params$defenseAlloc * X[4]
-      #   X[4] = X[4] - defenseAlloc
-      #   X[8] = X[8] + defenseAlloc
-      # }
+      if(defense == 2){
+        if(X[4] > 0) {
+          defenseAlloc = params$defenseAlloc * X[4]
+          X[4] = X[4] - defenseAlloc
+          X[8] = X[8] + defenseAlloc
+        }
+      }
 
       ## priority #7: Growth & reproduction
       if(X[4] > Smax){
@@ -170,10 +173,12 @@ SEM <- function(X, params, inputs, pest, timestep = 1800){
       }
       
       ## Defense
-      if(X[4] > 0) {
-        defenseAlloc = params$defenseAlloc * X[4]
-        X[4] = X[4] - defenseAlloc
-        X[8] = X[8] + defenseAlloc
+      if(defense == 3){
+        if(X[4] > 0) {
+          defenseAlloc = params$defenseAlloc * X[4]
+          X[4] = X[4] - defenseAlloc
+          X[8] = X[8] + defenseAlloc
+        }
       }
       
     }  ## end Store > Smax
