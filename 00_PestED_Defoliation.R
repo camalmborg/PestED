@@ -15,7 +15,7 @@ P = 101.325 ## average atm pressure (kPa)
 ##' @param pest [phloem, xylem, leaf, root, stem]
 ##' @author Michael C, Dietze <dietze@bu.edu>
 ##' @return X 
-SEM <- function(X, params, inputs, pest, timestep = 1800, defense){ 
+SEM <- function(X, params, inputs, pest, timestep = 1800, defense = 1){ 
   ## pest impacts:
   ## phloem feeders: % tax flux of carbon out of (GPP-Rl) and into Bstore
   ## xylem disruptors (bark beetle, canker, wilt, girdling): % decrease water supply 
@@ -290,10 +290,8 @@ params$Rfrac = 0.2
 params$SeedlingMort = 0.99
 params$Kleaf = (1/21/48)/2^2.5  ## assumes it takes 21 days to regrow at 25C
 ## Defense
-#params$defenseBreakdown = 0
-#params$defenseAlloc = 0
-params$defenseBreakdown = turnover_estimate[2]/86400*timestep
-params$defenseAlloc = alloc_estimate[17]
+params$defenseBreakdown = 0
+params$defenseAlloc = 0
 params$defenseEfficiency = 1
 
 ## initialize state variables
