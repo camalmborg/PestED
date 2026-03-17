@@ -36,7 +36,7 @@ for (i in 1:length(alloc_spread)){
     params$defenseBreakdown = turnover_spread[j]/86400*timestep
     # save param values:
     # run default (no defoliation case):
-    default <- iterate.SEM(c(0,0,0,0,1,0), years = 4)
+    default <- iterate.SEM(c(0,0,0,1,0), years = 4)
     mean_def_biomass[i,j] <- mean(default[,"Bdefense"]/(default[,"Bdefense"] + default[,"Bleaf"]), na.rm = TRUE)
     min_leaf_biomass[i,j] <- min(default[,"Bleaf"], na.rm = T)
     min_store_biomass[i,j] <- min(default[,"Bstore"], na.rm = T)
@@ -53,82 +53,86 @@ write.csv(min_store_biomass, file = "/projectnb/dietzelab/malmborg/Ch3_PestDefen
 
 
 
-## Check out results and view heat map
-# load superheat library:
-library(dplyr)
-library(superheat)
-library(grid)
-# load the csv of allocation/turnover tests:
-alloc_turn <- read.csv("/projectnb/dietzelab/malmborg/Ch3_PestDefense/mean_def_biomass_alloc_turnover.csv", row.names = 1) |>
-  # multiply by 100 to show mean defense chemistry in percentage of leaf biomass:
-  mutate(across(where(is.numeric), ~ .x * 100)) |>
-  # round for nicer display:
-  mutate(across(where(is.numeric), ~round(., digits = 3))) |>
-  # remove 0 allocation and defense row/column:
-  slice(-1) |>
-  select(-1)
+# ## Check out results and view heat map
+# # load superheat library:
+# library(dplyr)
+# library(superheat)
+# library(grid)
+# # load the csv of allocation/turnover tests:
+# alloc_turn <- read.csv("/projectnb/dietzelab/malmborg/Ch3_PestDefense/mean_def_biomass_alloc_turnover.csv", row.names = 1) |>
+#   # multiply by 100 to show mean defense chemistry in percentage of leaf biomass:
+#   mutate(across(where(is.numeric), ~ .x * 100)) |>
+#   # round for nicer display:
+#   mutate(across(where(is.numeric), ~round(., digits = 3))) |>
+#   # remove 0 allocation and defense row/column:
+#   slice(-1) |>
+#   select(-1)
+# 
+# # renaming columns and rows:
+# rownames(alloc_turn) <- as.character(seq(10, 200, by = 10))
+# colnames(alloc_turn) <- as.character(seq(0.5, 10, by = 0.5))
+# 
+# # values for color scaling in heatmap
+# vals <- c(1, 3, 7, 20, 28, 40, 50)
+# vals_scaled <- (vals - min(vals)) / (max(vals) - min(vals))
+# 
+# # highlight groups between 7-28% DW biomass defense values (Lindroth):
+# # mean and SD to compute highs and lows:
+# mean_defense <- mean(7:28)
+# sd_defense <- sd(7:28)
+# Bdefense_high <- mean_defense + sd_defense
+# Bdefense_low <- mean_defense - sd_defense
+# # make highlight group:
+# highlight <- alloc_turn < Bdefense_high & alloc_turn > Bdefense_low
+# highlight <- gsub("TRUE", "black", highlight)
+# highlight <- gsub("FALSE", "grey40", highlight)
+# highlight <- matrix(highlight, ncol = ncol(alloc_turn))
+# 
+# png(filename = "/projectnb/dietzelab/malmborg/Ch3_PestDefense/allocation_turnover_parameter_surface.png",
+#     width = 13, height = 9,
+#     units = "in", res = 600)
+# # make heatmap:
+# superheat(alloc_turn,
+#           # add text:
+#           X.text = as.matrix(round(alloc_turn, 2)),
+#           X.text.size = 4,
+#           # color to highlight certain values:
+#           X.text.col = highlight,
+#           # add color:
+#           heat.pal = c("skyblue1", "lightblue1", "lightcyan","white", "pink", "lightpink", "indianred1"),
+#           heat.pal.values = vals_scaled,
+#           legend = FALSE,
+#           # row and column labels:
+#           # row title
+#           row.title = "Defense Allocation (% annual storage)",
+#           row.title.size = 5,
+#           # col title
+#           column.title = "Rate of Turnover (% per unit time)",
+#           column.title.size = 5,
+#           # change size of labels:
+#           left.label.size = 0.1,
+#           bottom.label.size = 0.1,
+#           # change label text size:
+#           left.label.text.size = 5,
+#           bottom.label.text.size = 5)
+# dev.off()
 
-# renaming columns and rows:
-rownames(alloc_turn) <- as.character(seq(10, 200, by = 10))
-colnames(alloc_turn) <- as.character(seq(0.5, 10, by = 0.5))
-
-# values for color scaling in heatmap
-vals <- c(1, 3, 7, 20, 28, 40, 50)
-vals_scaled <- (vals - min(vals)) / (max(vals) - min(vals))
-
-# highlight groups between 7-28% DW biomass defense values (Lindroth):
-# mean and SD to compute highs and lows:
-mean_defense <- mean(7:28)
-sd_defense <- sd(7:28)
-Bdefense_high <- mean_defense + sd_defense
-Bdefense_low <- mean_defense - sd_defense
-# make highlight group:
-highlight <- alloc_turn < Bdefense_high & alloc_turn > Bdefense_low
-highlight <- gsub("TRUE", "black", highlight)
-highlight <- gsub("FALSE", "grey40", highlight)
-highlight <- matrix(highlight, ncol = ncol(alloc_turn))
-
-# make heatmap:
-superheat(alloc_turn,
-          # add text:
-          X.text = as.matrix(round(alloc_turn, 2)),
-          X.text.size = 4,
-          # color to highlight certain values:
-          X.text.col = highlight,
-          # add color:
-          heat.pal = c("skyblue1", "lightblue1", "lightcyan","white", "pink", "lightpink", "indianred1"),
-          heat.pal.values = vals_scaled,
-          legend = FALSE,
-          # row and column labels:
-          # row title
-          row.title = "Defense Allocation (% annual storage)",
-          row.title.size = 4,
-          # col title
-          column.title = "Rate of Turnover (% per unit time)",
-          column.title.size = 4,
-          # change size of labels:
-          left.label.size = 0.1,
-          bottom.label.size = 0.1,
-          # change label text size:
-          left.label.text.size = 4,
-          bottom.label.text.size = 4)
-
-# load minimum leaf biomass and storage biomass results:
-min_Bleaf <- alloc_turn <- read.csv("/projectnb/dietzelab/malmborg/Ch3_PestDefense/min_leaf_biomass_alloc_turnover.csv", row.names = 1) |>
-  # round for nicer display:
-  mutate(across(where(is.numeric), ~round(., digits = 3))) |>
-  # remove 0 allocation and defense row/column:
-  slice(-1) |>
-  select(-1)
-min_Bstore <- read.csv("/projectnb/dietzelab/malmborg/Ch3_PestDefense/min_store_biomass_alloc_turnover.csv", row.names = 1) |>
-  # round for nicer display:
-  mutate(across(where(is.numeric), ~round(., digits = 3))) |>
-  # remove 0 allocation and defense row/column:
-  slice(-1) |>
-  select(-1)
-
-# allocation values:
-alloc_estimate <- alloc_spread[5:21]
-turnover_estimate <- turnover_spread[2:7]
+# # load minimum leaf biomass and storage biomass results:
+# min_Bleaf <- alloc_turn <- read.csv("/projectnb/dietzelab/malmborg/Ch3_PestDefense/min_leaf_biomass_alloc_turnover.csv", row.names = 1) |>
+#   # round for nicer display:
+#   mutate(across(where(is.numeric), ~round(., digits = 3))) |>
+#   # remove 0 allocation and defense row/column:
+#   slice(-1) |>
+#   select(-1)
+# min_Bstore <- read.csv("/projectnb/dietzelab/malmborg/Ch3_PestDefense/min_store_biomass_alloc_turnover.csv", row.names = 1) |>
+#   # round for nicer display:
+#   mutate(across(where(is.numeric), ~round(., digits = 3))) |>
+#   # remove 0 allocation and defense row/column:
+#   slice(-1) |>
+#   select(-1)
+# 
+# # allocation values:
+# alloc_estimate <- alloc_spread[5:21]
+# turnover_estimate <- turnover_spread[2:7]
   
   
