@@ -5,10 +5,10 @@ wd <- setwd("/projectnb/dietzelab/malmborg/PestDefense/")
 source(paste0(wd, "/00_PestED_Defoliation.R"))
 
 ## add in allocation and turnover (set values):
-defense_alloc_percent = 110   # allocation
-defense_turnover_percent = 1  # turnover
+defense_alloc_percent = 70   # allocation
+defense_turnover_percent = 0.75  # turnover
 params$defenseAlloc = (defense_alloc_percent/100)/365/86400*timestep
-params$defenseBreakdown = (defense_turnover_percent/100)*366/300/86400*timestep
+params$defenseBreakdown = (defense_turnover_percent/100)/86400*timestep
 
 ## Making a ranges of allocation and turnover values (based on literature):
 # quantiles:
@@ -52,4 +52,16 @@ for (i in 1:length(defense_efficiencies)){
 saveRDS(default_result, file = "/projectnb/dietzelab/malmborg/Ch3_PestDefense/DED_default_result.rds")
 saveRDS(defol_result, file = "/projectnb/dietzelab/malmborg/Ch3_PestDefense/DED_defol_result.rds")
 
-#test <- readRDS("/projectnb/dietzelab/malmborg/Ch3_PestDefense/DED_default_result.rds")
+
+### Checking out results ###
+# # load:
+# default_list <- readRDS("/projectnb/dietzelab/malmborg/Ch3_PestDefense/DED_default_result.rds")
+# default_results <- default_list[[1]][1,]
+# # defolation results:
+# defol_list <- readRDS("/projectnb/dietzelab/malmborg/Ch3_PestDefense/DED_defol_result.rds")
+
+# ## Convert the defol_list to a dataframe
+# # extract first member of list:
+# all_defol <- data.frame()
+
+
