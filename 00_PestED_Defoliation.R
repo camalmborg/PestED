@@ -324,7 +324,7 @@ if(!exists('inputs')){
 varnames <- c("Bleaf","Bwood","Broot","Bstore","BSOM","Water","density","Bdefense","GPP","fopen","Rleaf","RstemRroot","Rgrow")  # might have to add a defense budget here?
 units <- c("kg/plant","kg/plant","kg/plant","kg/plant","Mg/ha","m","stems/ha","kg/plant")
 
-iterate.SEM <- function(pest, t.start = 7000, years){
+iterate.SEM <- function(pest, t.start = c(10000, 20000), years){
   
   pest.orig = pest
   #pest = c(0,0,1,1,0)
