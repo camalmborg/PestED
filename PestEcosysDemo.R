@@ -13,7 +13,7 @@ P = 101.325 ## average atm pressure (kPa)
 ##' @param pest [phloem, xylem, leaf, root, stem]
 ##' @author Michael C, Dietze <dietze@bu.edu>
 ##' @return X 
-SEM_nodef <- function(X, params, inputs, pest=c(0,0,0,1,0), timestep=1800){ 
+SEM <- function(X, params, inputs, pest=c(0,0,0,1,0), timestep=1800){ 
   ## pest impacts:
   ## phloem feaders: % tax flux of carbon out of (GPP-Rl) and into Bstore
   ## xylem disrupters (bark beetle, canker, wilt, girdling): % decrease water supply 
