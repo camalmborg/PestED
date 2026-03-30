@@ -38,7 +38,7 @@ SEM <- function(X, params, inputs, pest, timestep = 1800, defense = 1){
   supply = (1 - pest[2]) * params$Kroot * X[3] * paw * X[7] # potential rate of water uptake, umol/m2Ground/s
   
   ### turnover (tree)  ###
-  leafLitter = X[1] * min(1, params$leafLitter + max(0,pest[3] - params$defenseEfficiency*X[8])) # not defoliating over 100%
+  leafLitter = X[1] * min(1, params$leafLitter + max(0, pest[3] - params$defenseEfficiency*X[8])) # not defoliating over 100%
   CWD        = X[2] * params$CWD
   rootLitter = X[3] * pest[4] * params$rootLitter
   defenseLoss = min(X[8], X[8]*params$defenseBreakdown + leafLitter/X[1]*X[8]) ## chemical turnover + litter loss (no translocation)
@@ -301,7 +301,7 @@ X[1] = X[3] = X[4] = params$allomL0 * DBH^params$allomL1
 X[2] = params$allomB0 * DBH^params$allomB1 
 X[5] = 10
 X[7] = 700
-X[8] = 0
+X[8] = X[1]*0.175
 
 
 if(!exists('inputs')){
@@ -324,7 +324,11 @@ if(!exists('inputs')){
 varnames <- c("Bleaf","Bwood","Broot","Bstore","BSOM","Water","density","Bdefense","GPP","fopen","Rleaf","RstemRroot","Rgrow")  # might have to add a defense budget here?
 units <- c("kg/plant","kg/plant","kg/plant","kg/plant","Mg/ha","m","stems/ha","kg/plant")
 
-iterate.SEM <- function(pest, t.start = c(7000), years){
+# same gap apart in years: 7000, 24520
+# weeks: 7000:11032 is a month
+# multiple days: 
+#defol_days <- c(seq(7000, 11032, by = 144))
+iterate.SEM <- function(pest, t.start = c(7000,24520), years){
   # pest:
   pest.orig = pest
   #pest = c(0,0,1,1,0)
