@@ -10,7 +10,7 @@ library(patchwork)
 
 ## Processing data for making plots
 # selecting desired columns for figures:
-cols <- c("Bwood", "Bleaf", "Bstore", "Bdefense")
+cols <- c("Bwood", "Bleaf", "Bstore", "Bdefense", "density")
 
 # processing data:
 SEM_output_fx <- function(output, cols, model_run, years){
@@ -32,10 +32,10 @@ def <- SEM_output_fx(defol, cols = cols, model_run = 4, years = 5)
 def2 <- SEM_output_fx(defol2, cols = cols, model_run = 5, years = 5)
 def3 <- SEM_output_fx(defol3, cols = cols, model_run = 6, years = 5)
 #all <- rbind(dnd, dwd, def_nd, def, def2, def3)
-all <- rbind(dwd, def_nd, def, def2, def3)
+all <- rbind(def_nd, def, def2, def3)
 
 # selecting and processing for plots:
-var <- grep("Bleaf", cols)
+var <- grep("density", cols)
 
 bleaf <- all |>
   # select desired variable:
