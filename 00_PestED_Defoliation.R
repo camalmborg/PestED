@@ -328,7 +328,7 @@ units <- c("kg/plant","kg/plant","kg/plant","kg/plant","Mg/ha","m","stems/ha","k
 # weeks: 7000:11032 is a month
 # multiple days: 
 #defol_days <- c(seq(7000, 11032, by = 144))
-iterate.SEM <- function(pest, t.start = c(7000,24520), years){
+iterate.SEM <- function(pest, t.start = c(7000), years){
   # pest:
   pest.orig = pest
   #pest = c(0,0,1,1,0)
