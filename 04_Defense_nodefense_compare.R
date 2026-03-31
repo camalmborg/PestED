@@ -3,7 +3,6 @@
 ## Load libraries
 library(dplyr)
 
-
 ## Load functions
 source("/projectnb/dietzelab/malmborg/PestDefense/00_PestED_Defoliation.R")
 
