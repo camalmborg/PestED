@@ -292,7 +292,7 @@ params$Kleaf = (1/21/48)/2^2.5  ## assumes it takes 21 days to regrow at 25C
 ## Defense
 params$defenseBreakdown = 0
 params$defenseAlloc = 0
-params$defenseEfficiency = 1
+params$defenseEfficiency = 0.75
 
 ## initialize state variables
 DBH = 10
@@ -301,7 +301,7 @@ X[1] = X[3] = X[4] = params$allomL0 * DBH^params$allomL1
 X[2] = params$allomB0 * DBH^params$allomB1 
 X[5] = 10
 X[7] = 700
-X[8] = X[1]*0.175
+X[8] = X[1]*(0.175/365/86400*timestep)
 
 
 if(!exists('inputs')){
@@ -324,11 +324,12 @@ if(!exists('inputs')){
 varnames <- c("Bleaf","Bwood","Broot","Bstore","BSOM","Water","density","Bdefense","GPP","fopen","Rleaf","RstemRroot","Rgrow")  # might have to add a defense budget here?
 units <- c("kg/plant","kg/plant","kg/plant","kg/plant","Mg/ha","m","stems/ha","kg/plant")
 
-# same gap apart in years: 7000, 24520
-# weeks: 7000:11032 is a month
+# same gap apart in years: 7000, 24520, 
+# weeks: 7000:11032 is a month in 3 year case
 # multiple days: 
-#defol_days <- c(seq(7000, 11032, by = 144))
-iterate.SEM <- function(pest, t.start = c(7000), years){
+#defol_days <- c(seq(7000, 13048, by = 144))
+defol_days <- c(7000, 24520, 42040)
+iterate.SEM <- function(pest, t.start = defol_days, years){
   # pest:
   pest.orig = pest
   #pest = c(0,0,1,1,0)
@@ -372,7 +373,7 @@ if(FALSE){
   check <- default[,"Bdefense"]/(default[,"Bdefense"] + default[,"Bleaf"])
   plot(check)
 
-  defol = iterate.SEM(c(0,0,1,1,0), years = 3)  ## assume a one-time 100% defoliation
+  defol = iterate.SEM(c(0,0,0.1,1,0), years = 3)  ## assume a one-time 100% defoliation
   plot.SEM(defol)
   check <- defol[,"Bdefense"]/(defol[,"Bdefense"] + defol[,"Bleaf"])
   plot(check)
