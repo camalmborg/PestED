@@ -21,26 +21,55 @@ SEM_output_fx <- function(output, cols, model_run, years){
     mutate(timestep = 1:nrow(output), .before = 2) |>
     # add column for years:
     mutate(year = rep(1:years, each = nrow(output)/years), .before = 3)
+  return(model_outputs)
 }
 
+# function for processing all datasets in group:
+SEM_plot_data_fx <- function(output_list){
+  # make new list for processed data:
+  processed <- list()
+  # loop for going through each with output data processor:
+  for(i in 1:length(output_list)){
+    out <- SEM_output_fx(output_list[[i]], cols, i, years)
+    processed[[i]] <- out
+  }
+  # rbind list:
+  plot_data <- do.call(rbind, processed)
+  rm(processed)
+  return(plot_data)
+}
+
+# plot data:
+time_series_data <- SEM_plot_data_fx(alloc_turn_results)
+
 ## Making figures:
-# 
 
 
 # selecting and processing for plots:
-var <- grep("density", cols)
+var <- grep("Bleaf", cols)
 
-bleaf <- all |>
+bleaf <- time_series_data |>
   # select desired variable:
   select(-c(cols)[-c(var)]) |>
   # rename column for making plot:
-  rename(value = cols[var]) #|>
-  #drop_na(value)
+  rename(value = cols[var]) |>
+  # select the models you want:
+  filter(model_run = c(1, 3, 6, 8)) |>
+  # remove na rows for plotting (if applicable)
+  drop_na(value)
+
+# color palette:
+line_palette <- colorRampPalette(c("blue", "red"))
+# generate colors based on the number of lines
+n_lines <- length()
+line_colors <- line_palette(n_lines)
 
 ## Making plots
-test_plot <- ggplot(data = bleaf, aes(x = timestep, y = value, group = model_run, color = model_run)) +
+test_plot <- ggplot(data = bleaf, aes(x = timestep, y = value, 
+                                      group = model_run, 
+                                      color = as.factor(model_run))) +
   geom_line(linewidth = 1) +
-  scale_color_gradient(low = "blue", high = "red") +
+  scale_color_manual(values = line_colors) +
   theme_bw() +
   theme(legend.position = "right",
         panel.grid = element_blank())
