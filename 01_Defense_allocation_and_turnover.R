@@ -135,6 +135,6 @@ min_Bstore <- read.csv("/projectnb/dietzelab/malmborg/Ch3_PestDefense/min_store_
 
 # allocation and turnover values for time series based on orthogonal/on axis values chosen from heatmap:
 alloc_runs <- c(40, 50, 70, 70, 80, 90, 100, 110, 120)
-turn_runs <- turnover_spread[c(3, 4, 6, 10, 9, 8, 7, 10, 11)]
+turn_runs <- turnover_spread[c(3, 4, 6, 10, 9, 8, 7, 10, 11)]*100  # make percentage
 
 
