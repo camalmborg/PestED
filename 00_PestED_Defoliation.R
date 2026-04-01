@@ -324,11 +324,11 @@ if(!exists('inputs')){
 varnames <- c("Bleaf","Bwood","Broot","Bstore","BSOM","Water","density","Bdefense","GPP","fopen","Rleaf","RstemRroot","Rgrow")  # might have to add a defense budget here?
 units <- c("kg/plant","kg/plant","kg/plant","kg/plant","Mg/ha","m","stems/ha","kg/plant")
 
-# same gap apart in years: 7000, 24520, 
+# same gap apart in years: 7000, 24520, adding 17520 each time
 # weeks: 7000:11032 is a month in 3 year case
 # multiple days: 
 #defol_days <- c(seq(7000, 13048, by = 144))
-defol_days <- c(7000, 24520, 42040)
+defol_days <- c(7000, 24520, 42040, 59560, 77080)
 iterate.SEM <- function(pest, t.start = defol_days, years){
   # pest:
   pest.orig = pest
@@ -368,12 +368,12 @@ plot.SEM <- function(output){
 
 if(FALSE){
 
-  default = iterate.SEM(c(0,0,0,1,0), years = 3)
+  default = iterate.SEM(c(0,0,0,1,0), years = 5)
   plot.SEM(default)
   check <- default[,"Bdefense"]/(default[,"Bdefense"] + default[,"Bleaf"])
   plot(check)
 
-  defol = iterate.SEM(c(0,0,0.1,1,0), years = 3)  ## assume a one-time 100% defoliation
+  defol = iterate.SEM(c(0,0,0.25,1,0), years = 5)  ## assume a one-time 100% defoliation
   plot.SEM(defol)
   check <- defol[,"Bdefense"]/(defol[,"Bdefense"] + defol[,"Bleaf"])
   plot(check)
