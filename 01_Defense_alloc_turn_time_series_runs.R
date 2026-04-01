@@ -19,6 +19,7 @@ alloc_turn_runs <- data.frame(model_run = 1:9,
 alloc_turn_results <- list()
 # years for time series:
 years = 5
+defol_days = c(7000)
 
 # loop:
 for (i in 1:nrow(alloc_turn_runs)){
@@ -30,7 +31,7 @@ for (i in 1:nrow(alloc_turn_runs)){
   params$defenseEfficiency = 1
   
   # run the model:
-  defol_model_run <- iterate.SEM(c(0,0,1,1,0), years = years)
+  defol_model_run <- iterate.SEM(c(0,0,1,1,0), t.start = defol_days, years = years)
   
   # save it:
   name <- paste0(i, "_alloc_", defense_alloc_percent, 
@@ -39,8 +40,6 @@ for (i in 1:nrow(alloc_turn_runs)){
   alloc_turn_results[[name]] <- defol_model_run
   rm(defol_model_run)
 }
-
-
 
 
 
