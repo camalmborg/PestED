@@ -54,21 +54,21 @@ bleaf <- time_series_data |>
   # rename column for making plot:
   rename(value = cols[var]) |>
   # select the models you want:
-  filter(model_run = c(1, 3, 6, 8)) |>
+  filter(model_run == c(1, 3, 6, 8)) |>
   # remove na rows for plotting (if applicable)
   drop_na(value)
 
 # color palette:
 line_palette <- colorRampPalette(c("blue", "red"))
 # generate colors based on the number of lines
-n_lines <- length()
+n_lines <- length(unique(bleaf$model_run))
 line_colors <- line_palette(n_lines)
 
 ## Making plots
 test_plot <- ggplot(data = bleaf, aes(x = timestep, y = value, 
                                       group = model_run, 
                                       color = as.factor(model_run))) +
-  geom_line(linewidth = 1) +
+  geom_line(linewidth = 0.75) +
   scale_color_manual(values = line_colors) +
   theme_bw() +
   theme(legend.position = "right",
