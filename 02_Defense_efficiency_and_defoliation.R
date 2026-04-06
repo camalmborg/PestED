@@ -84,3 +84,20 @@ for (i in 2:length(defol_list)){
   rm(list_member)
 }
 
+
+
+
+# set all param values to 0:
+params$defenseAlloc = 0
+params$defenseBreakdown = 0
+params$defenseEfficiency = 0
+# set defense state variable to 0:
+X[8] = 0
+# run SEM no defense allocation:
+defol_no_def = iterate.SEM(c(0,0,1,1,0), t.start = defol_days, years = years)
+# add it to the results plot:
+name <- paste0(length(alloc_turn_results)+1, "_alloc_0",
+               "_turnover_0",
+               "_position_NA")
+alloc_turn_results[[name]] <- defol_no_def
+rm(name)
