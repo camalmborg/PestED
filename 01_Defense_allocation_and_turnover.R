@@ -50,7 +50,7 @@ for (i in 1:length(alloc_spread)){
 
 write.csv(mean_def_biomass, file = paste0("/projectnb/dietzelab/malmborg/Ch3_PestDefense/allocation_turnover/param_surface_analyses/", Sys.Date(), "_mean_def_biomass_alloc_turnover.csv"))
 write.csv(min_leaf_biomass, file = paste0("/projectnb/dietzelab/malmborg/Ch3_PestDefense/allocation_turnover/param_surface_analyses/", Sys.Date(), "_min_leaf_biomass_alloc_turnover.csv"))
-write.csv(min_store_biomass, file = paste0("/projectnb/dietzelab/malmborg/Ch3_PestDefense/allocation_turnover/param_surface_analyses/", Sys.Date(), "min_store_biomass_alloc_turnover.csv"))
+write.csv(min_store_biomass, file = paste0("/projectnb/dietzelab/malmborg/Ch3_PestDefense/allocation_turnover/param_surface_analyses/", Sys.Date(), "_min_store_biomass_alloc_turnover.csv"))
 
 date <- Sys.Date()
 
@@ -90,7 +90,7 @@ highlight <- gsub("TRUE", "black", highlight)
 highlight <- gsub("FALSE", "grey40", highlight)
 highlight <- matrix(highlight, ncol = ncol(alloc_turn))
 
-png(filename = paste0("/projectnb/dietzelab/malmborg/Ch3_PestDefense/", Sys.Date(), "_allocation_turnover_parameter_surface.png"),
+png(filename = paste0("/projectnb/dietzelab/malmborg/Ch3_PestDefense/allocation_turnover/Figures/", Sys.Date(), "_allocation_turnover_parameter_surface.png"),
     width = 13, height = 9,
     units = "in", res = 600)
 # make heatmap:
@@ -132,10 +132,6 @@ dev.off()
 #   # remove 0 allocation and defense row/column:
 #   slice(-1) |>
 #   select(-1)
-
-# allocation and turnover values for time series based on orthogonal/on axis values chosen from heatmap:
-alloc_runs <- c(30, 60, 70, 90, 110, 120, 160)
-turn_runs <- turnover_spread[c(3,9,6,8,7,10,11)]*100  # make percentage
 
 
 ### ARCHIVE ###

@@ -12,11 +12,14 @@ library(patchwork)
 source("/projectnb/dietzelab/malmborg/PestDefense/00_PestED_Defoliation.R")
 
 ## Set up runs
+# allocation and turnover values for time series based on orthogonal/on axis values chosen from heatmap:
+alloc_runs <- c(40, 70, 90, 110, 120)
+turn_runs <- turnover_spread[c(3, 9, 8, 7, 11)]*100  # make percentage
 # make data frame for each run:
 alloc_turn_runs <- data.frame(model_run = 1:length(alloc_runs),
                               alloc = alloc_runs,
                               turn = turn_runs,
-                              ax_or = c("ax", "or", "ax", "ctr", "or", "ax", "ax"))
+                              ax_or = c("ax", "or", "ctr", "or", "ax"))
 
 
 ## Running the model and collecting results
@@ -66,7 +69,7 @@ time_series_data <- SEM_plot_data_fx(alloc_turn_results) |>
   mutate(turnover = turn_runs[model_run])
 
 # model runs chosen for example plots:
-lines = c(1, 2, 4, 5, 7)
+lines = c(1:5)
 # labels for lines:
 #a <- unique(time_series_data$alloc)[lines]
 a <- alloc_turn_runs$alloc/100/365/86400*timestep
@@ -75,17 +78,24 @@ t <- unique(time_series_data$turnover)[lines]
 labels <- paste0("allocation = ", a, "%, turnover = ", t, "%")
 
 # making plots:
-wood <- time_series_plot_fx(cols = cols, var = 1, runs = lines, labels = labels)
-leaf <- time_series_plot_fx(cols = cols, var = 2, runs = lines, labels = labels)
-store <- time_series_plot_fx(cols = cols, var = 3, runs = lines, labels = labels)
-defense <- time_series_plot_fx(cols = cols, var = 4, runs = lines, labels = labels)
-density <- time_series_plot_fx(cols = cols, var = 5, runs = lines, labels = labels)
+wood <- time_series_plot_fx(ts = time_series_data, cols = cols, var = 1, runs = lines, labels = labels)
+leaf <- time_series_plot_fx(ts = time_series_data, cols = cols, var = 2, runs = lines, labels = labels)
+store <- time_series_plot_fx(ts = time_series_data, cols = cols, var = 3, runs = lines, labels = labels)
+defense <- time_series_plot_fx(ts = time_series_data, cols = cols, var = 4, runs = lines, labels = labels)
+density <- time_series_plot_fx(ts = time_series_data, cols = cols, var = 5, runs = lines, labels = labels)
 
 # combining plots:
 combined <- (wood + leaf + store + density) + 
   plot_layout(ncol = 2, guides = "collect") & 
   theme(legend.position = "right")
+#combined
+
+# save plots:
+save_dir <- "/projectnb/dietzelab/malmborg/Ch3_PestDefense/allocation_turnover/Figures/"
+png(filename = paste0(save_dir, Sys.Date(), "_alloc_turn_biomass_time_series_plots.png"),
+    height = 10, width = 15, units = "in", res = 600)
 combined
+dev.off()
 
 
 ### Archive ###
