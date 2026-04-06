@@ -4,6 +4,9 @@
 
 ## Load libraries
 library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(patchwork)
 
 ## Load functions
 source("/projectnb/dietzelab/malmborg/PestDefense/00_PestED_Defoliation.R")
@@ -44,25 +47,52 @@ for (i in 1:nrow(alloc_turn_runs)){
   rm(defol_model_run)
 }
 
-## Run a defoliation with no defense added cases for each:
-# set all param values to 0:
-params$defenseAlloc = 0
-params$defenseBreakdown = 0
-params$defenseEfficiency = 0
-# set defense state variable to 0:
-X[8] = 0
-# run SEM no defense allocation:
-defol_no_def = iterate.SEM(c(0,0,1,1,0), t.start = defol_days, years = years)
-# add it to the results plot:
-name <- paste0(length(alloc_turn_results)+1, "_alloc_0",
-               "_turnover_0",
-               "_position_NA")
-alloc_turn_results[[name]] <- defol_no_def
-rm(name)
+
+## Making time series plots:
+# load plotting functions:
+source("/projectnb/dietzelab/malmborg/PestDefense/04_Defense_time_series_plots_script.R")
+
+## Processing data for making plots
+# selecting desired columns for figures:
+variables <- c(2, 1, 4, 8, 7)
+cols <- varnames[variables]
+names <- c("Wood", "Leaf", "Storage", "Defense", "Density")
+plot_units <- units[variables]
+
+# making plot data from alloc_turnover results list:
+time_series_data <- SEM_plot_data_fx(alloc_turn_results) |>
+  # add allocation and turnover values for trying to deal with labeling:
+  mutate(alloc = alloc_runs[model_run]) |>
+  mutate(turnover = turn_runs[model_run])
+
+# model runs chosen for example plots:
+lines = c(1, 2, 4, 5, 7)
+# labels for lines:
+#a <- unique(time_series_data$alloc)[lines]
+a <- alloc_turn_runs$alloc/100/365/86400*timestep
+a <- round((a/timestep*86400*100), 2)[lines]  # expressed as percentage of daily storage, matching param surface
+t <- unique(time_series_data$turnover)[lines]
+labels <- paste0("allocation = ", a, "%, turnover = ", t, "%")
+
+# making plots:
+wood <- time_series_plot_fx(cols = cols, var = 1, runs = lines, labels = labels)
+leaf <- time_series_plot_fx(cols = cols, var = 2, runs = lines, labels = labels)
+store <- time_series_plot_fx(cols = cols, var = 3, runs = lines, labels = labels)
+defense <- time_series_plot_fx(cols = cols, var = 4, runs = lines, labels = labels)
+density <- time_series_plot_fx(cols = cols, var = 5, runs = lines, labels = labels)
+
+# combining plots:
+combined <- (wood + leaf + store + density) + 
+  plot_layout(ncol = 2, guides = "collect") & 
+  theme(legend.position = "right")
+combined
 
 
 ### Archive ###
 ## Setting up model runs for parallel jobs
 # call the run:
 #task_id <- as.numeric(Sys.getenv("SGE_TASK_ID"))
+
+
+#cols <- c("Bwood", "Bleaf", "Bstore", "Bdefense", "density")
 
