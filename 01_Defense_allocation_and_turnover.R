@@ -133,9 +133,9 @@ dev.off()
 #   slice(-1) |>
 #   select(-1)
 
-# # allocation and turnover values for time series based on orthogonal/on axis values chosen from heatmap:
-# alloc_runs <- c(30, 60, 70, 90, 110, 120, 160)
-# turn_runs <- turnover_spread[c(3, 4, 6, 10, 9, 8, 7, 10, 11)]*100  # make percentage
+# allocation and turnover values for time series based on orthogonal/on axis values chosen from heatmap:
+alloc_runs <- c(30, 60, 70, 90, 110, 120, 160)
+turn_runs <- turnover_spread[c(3,9,6,8,7,10,11)]*100  # make percentage
 
 
 ### ARCHIVE ###
