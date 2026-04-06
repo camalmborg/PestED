@@ -44,6 +44,7 @@ time_series_data <- SEM_plot_data_fx(alloc_turn_results)
 
 ## Making figures:
 time_series_plot_fx <- function(cols, var, runs){
+  # set up plot data:
   plot_data <- time_series_data |>
     # select desired variable:
     select(-c(cols)[-c(var)]) |>
@@ -60,7 +61,11 @@ time_series_plot_fx <- function(cols, var, runs){
   n_lines <- length(unique(bleaf$model_run))
   line_colors <- line_palette(n_lines)
   
-  ## Making plots
+  # names for plots:
+  x_axis <- "Year"
+  y_axis <- ""
+  
+  # making plots:
   test_plot <- ggplot(data = plot_data, aes(x = timestep, y = value, 
                                             group = model_run, 
                                             color = as.factor(model_run))) +
@@ -79,10 +84,10 @@ plot_data <- time_series_data |>
   select(-c(cols)[-c(var)]) |>
   # rename column for making plot:
   rename(value = cols[var]) |>
-  # select the models you want:
-  filter(model_run == c(1, 3, 6, 8)) |>
   # remove na rows for plotting (if applicable)
-  drop_na(value)
+  drop_na(value) |>
+  # select the models you want:
+  filter(model_run == c(1, 3, 6, 8)) 
 
 # color palette:
 line_palette <- colorRampPalette(c("blue", "red"))
@@ -96,6 +101,7 @@ test_plot <- ggplot(data = plot_data, aes(x = timestep, y = value,
                                       color = as.factor(model_run))) +
   geom_line(linewidth = 0.75) +
   scale_color_manual(values = line_colors) +
+  scale_x_continuous(breaks = plot_data$timestep, labels = plot_data$year) +
   theme_bw() +
   theme(legend.position = "right",
         panel.grid = element_blank())

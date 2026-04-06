@@ -7,7 +7,7 @@ library(dplyr)
 source("/projectnb/dietzelab/malmborg/PestDefense/00_PestED_Defoliation.R")
 
 
-## Run a default with no defense added case
+## Run a defoliation with no defense added case
 # set all param values to 0:
 params$defenseAlloc = 0
 params$defenseBreakdown = 0
@@ -15,7 +15,7 @@ params$defenseEfficiency = 0
 # set defense state variable to 0:
 X[8] = 0
 # run SEM no defense allocation:
-default_no_defense = iterate.SEM(c(0,0,0,1,0), years = 5)
+#default_no_defense = iterate.SEM(c(0,0,0,1,0), years = 5)
 defol_no_def = iterate.SEM(c(0,0,1,1,0), years = 5)
 
 ## Run default with defense allocation but no defense efficiency
