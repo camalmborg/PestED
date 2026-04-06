@@ -292,7 +292,7 @@ params$Kleaf = (1/21/48)/2^2.5  ## assumes it takes 21 days to regrow at 25C
 ## Defense
 params$defenseBreakdown = 0
 params$defenseAlloc = 0
-params$defenseEfficiency = 0.75
+params$defenseEfficiency = 1
 
 ## initialize state variables
 DBH = 10
@@ -328,7 +328,7 @@ units <- c("kg/plant","kg/plant","kg/plant","kg/plant","Mg/ha","m","stems/ha","k
 # weeks: 7000:11032 is a month in 3 year case
 # multiple days: 
 #defol_days <- c(seq(7000, 13048, by = 144))
-defol_days <- c(7000, 24520, 42040, 59560, 77080)
+defol_days <- c(7000)
 iterate.SEM <- function(pest, t.start = defol_days, years){
   # pest:
   pest.orig = pest
