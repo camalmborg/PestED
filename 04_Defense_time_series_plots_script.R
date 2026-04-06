@@ -43,11 +43,13 @@ SEM_plot_data_fx <- function(output_list){
 
 
 ## Function for making figures
+#'@param ts = time series data from SEM_plot_data_fx
 #'@param cols = character vector, which columns from time series data you want, e.g. "Bleaf"
 #'@param var = character vector, which variable that is, e.g "Leaf Biomass"
 #'@param runs = numeric vector, which model runs you would like to include on plot, keeping number of lines 5 or less
 #'@param lables = character vector, legend labels
-time_series_plot_fx <- function(cols, var, runs, labels){
+time_series_plot_fx <- function(ts, cols, var, runs, labels){
+  time_series_data <- ts
   # set up plot data:
   plot_data <- time_series_data |>
     # select desired variable:
@@ -83,15 +85,17 @@ time_series_plot_fx <- function(cols, var, runs, labels){
     scale_x_continuous(breaks = seq(1, max(plot_data$timestep), by = length(plot_data$timestep)/max(plot_data$year)),
                        labels = c(1:max(plot_data$year))) +
     theme_bw() +
-    theme(axis.title = element_text(size = 12),
-          axis.text = element_text(size = 12),
-          plot.title = element_text(size = 12),
+    theme(axis.title = element_text(size = 14),
+          axis.text = element_text(size = 14),
+          plot.title = element_text(size = 14),
           legend.position = "right",
-          legend.text = element_text(size = 10),
+          legend.text = element_text(size = 12),
           panel.grid = element_blank())
   
   return(var_plot)
 }
+
+
 
 
 ### Archive ###
@@ -103,34 +107,3 @@ time_series_plot_fx <- function(cols, var, runs, labels){
 # def3 <- SEM_output_fx(defol3, cols = cols, model_run = 6, years = 5)
 # #all <- rbind(dnd, dwd, def_nd, def, def2, def3)
 # all <- rbind(def_nd, def, def2, def3)
-
-
-# # selecting and processing for plots:
-# var <- grep("density", cols)
-# 
-# plot_data <- time_series_data |>
-#   # select desired variable:
-#   select(-c(cols)[-c(var)]) |>
-#   # rename column for making plot:
-#   rename(value = cols[var]) |>
-#   # remove na rows for plotting (if applicable)
-#   drop_na(value) |>
-#   # select the models you want:
-#   filter(model_run == c(1, 2, 4, 5, 7)) 
-# 
-# # color palette:
-# line_palette <- colorRampPalette(c("blue", "red"))
-# # generate colors based on the number of lines
-# n_lines <- length(unique(plot_data$model_run))
-# line_colors <- line_palette(n_lines)
-# 
-# ## Making plots
-# test_plot <- ggplot(data = plot_data, aes(x = timestep, y = value, 
-#                                           group = model_run, 
-#                                           color = as.factor(model_run))) +
-#   geom_line(linewidth = 0.75) +
-#   scale_color_manual(values = line_colors) +
-#   theme_bw() +
-#   theme(legend.position = "right",
-#         panel.grid = element_blank())
-# test_plot
