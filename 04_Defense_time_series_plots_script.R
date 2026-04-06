@@ -6,15 +6,12 @@ library(tidyr)
 library(ggplot2)
 library(patchwork)
 
-## Processing data for making plots
-# selecting desired columns for figures:
-variables <- c(2, 1, 4, 8, 7)
-cols <- varnames[variables]
-names <- c("Wood", "Leaf", "Storage", "Defense", "Density")
-plot_units <- units[variables]
-#cols <- c("Bwood", "Bleaf", "Bstore", "Bdefense", "density")
-
+## Functions for setting up data for time series
 # processing data function:
+#'@param output = output time series = dataframe
+#'@param cols = which columns you want to keep from each time series = character vector
+#'@param model_run = which model run you are on = numeric; used for list number i in loop for SEM_plot_data_fx
+#'@param years = number of years = numeric
 SEM_output_fx <- function(output, cols, model_run, years){
   model_outputs <- as.data.frame(output) |>
     # select columns for plots:
@@ -29,6 +26,7 @@ SEM_output_fx <- function(output, cols, model_run, years){
 }
 
 # function for processing all datasets in group:
+#'@param output_list = list object with outputs from SEM model runs
 SEM_plot_data_fx <- function(output_list){
   # make new list for processed data:
   processed <- list()
@@ -43,11 +41,13 @@ SEM_plot_data_fx <- function(output_list){
   return(plot_data)
 }
 
-# plot data:
-time_series_data <- SEM_plot_data_fx(alloc_turn_results)
 
-## Making figures:
-time_series_plot_fx <- function(cols, var, runs){
+## Function for making figures
+#'@param cols = character vector, which columns from time series data you want, e.g. "Bleaf"
+#'@param var = character vector, which variable that is, e.g "Leaf Biomass"
+#'@param runs = numeric vector, which model runs you would like to include on plot, keeping number of lines 5 or less
+#'@param lables = character vector, legend labels
+time_series_plot_fx <- function(cols, var, runs, labels){
   # set up plot data:
   plot_data <- time_series_data |>
     # select desired variable:
@@ -75,10 +75,10 @@ time_series_plot_fx <- function(cols, var, runs){
                                             group = model_run, 
                                             color = as.factor(model_run))) +
     geom_line(linewidth = 0.75) +
-    scale_color_manual(values = line_colors) +
+    scale_color_manual(values = line_colors, labels = labels) +
     labs(title = plot_title,
          x = x_axis, y = y_axis,
-         color = "Model") +
+         color = "") +
     # make x-axis labeled years:
     scale_x_continuous(breaks = seq(1, max(plot_data$timestep), by = length(plot_data$timestep)/max(plot_data$year)),
                        labels = c(1:max(plot_data$year))) +
@@ -87,6 +87,7 @@ time_series_plot_fx <- function(cols, var, runs){
           axis.text = element_text(size = 12),
           plot.title = element_text(size = 12),
           legend.position = "right",
+          legend.text = element_text(size = 10),
           panel.grid = element_blank())
   
   return(var_plot)
