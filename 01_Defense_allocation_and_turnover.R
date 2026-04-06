@@ -48,9 +48,9 @@ for (i in 1:length(alloc_spread)){
   }
 }
 
-write.csv(mean_def_biomass, file = paste0("/projectnb/dietzelab/malmborg/Ch3_PestDefense/", Sys.Date(), "_mean_def_biomass_alloc_turnover.csv"))
-write.csv(min_leaf_biomass, file = paste0("/projectnb/dietzelab/malmborg/Ch3_PestDefense/", Sys.Date(), "_min_leaf_biomass_alloc_turnover.csv"))
-write.csv(min_store_biomass, file = paste0("/projectnb/dietzelab/malmborg/Ch3_PestDefense/", Sys.Date(), "min_store_biomass_alloc_turnover.csv"))
+write.csv(mean_def_biomass, file = paste0("/projectnb/dietzelab/malmborg/Ch3_PestDefense/allocation_turnover/param_surface_analyses/", Sys.Date(), "_mean_def_biomass_alloc_turnover.csv"))
+write.csv(min_leaf_biomass, file = paste0("/projectnb/dietzelab/malmborg/Ch3_PestDefense/allocation_turnover/param_surface_analyses/", Sys.Date(), "_min_leaf_biomass_alloc_turnover.csv"))
+write.csv(min_store_biomass, file = paste0("/projectnb/dietzelab/malmborg/Ch3_PestDefense/allocation_turnover/param_surface_analyses/", Sys.Date(), "min_store_biomass_alloc_turnover.csv"))
 
 date <- Sys.Date()
 
@@ -60,7 +60,7 @@ library(dplyr)
 library(superheat)
 library(grid)
 # load the csv of allocation/turnover tests:
-alloc_turn <- read.csv(paste0("/projectnb/dietzelab/malmborg/Ch3_PestDefense/", date, "_mean_def_biomass_alloc_turnover.csv"), row.names = 1) |>
+alloc_turn <- read.csv(paste0("/projectnb/dietzelab/malmborg/Ch3_PestDefense/allocation_turnover/param_surface_analyses/", date, "_mean_def_biomass_alloc_turnover.csv"), row.names = 1) |>
   # multiply by 100 to show mean defense chemistry in percentage of leaf biomass:
   mutate(across(where(is.numeric), ~ .x * 100)) |>
   # round for nicer display:
@@ -119,22 +119,25 @@ superheat(alloc_turn,
           bottom.label.text.size = 5)
 dev.off()
 
-# load minimum leaf biomass and storage biomass results:
-min_Bleaf <- alloc_turn <- read.csv("/projectnb/dietzelab/malmborg/Ch3_PestDefense/min_leaf_biomass_alloc_turnover.csv", row.names = 1) |>
-  # round for nicer display:
-  mutate(across(where(is.numeric), ~round(., digits = 3))) |>
-  # remove 0 allocation and defense row/column:
-  slice(-1) |>
-  select(-1)
-min_Bstore <- read.csv("/projectnb/dietzelab/malmborg/Ch3_PestDefense/min_store_biomass_alloc_turnover.csv", row.names = 1) |>
-  # round for nicer display:
-  mutate(across(where(is.numeric), ~round(., digits = 3))) |>
-  # remove 0 allocation and defense row/column:
-  slice(-1) |>
-  select(-1)
+# # load minimum leaf biomass and storage biomass results:
+# min_Bleaf <- alloc_turn <- read.csv("/projectnb/dietzelab/malmborg/Ch3_PestDefense/min_leaf_biomass_alloc_turnover.csv", row.names = 1) |>
+#   # round for nicer display:
+#   mutate(across(where(is.numeric), ~round(., digits = 3))) |>
+#   # remove 0 allocation and defense row/column:
+#   slice(-1) |>
+#   select(-1)
+# min_Bstore <- read.csv("/projectnb/dietzelab/malmborg/Ch3_PestDefense/min_store_biomass_alloc_turnover.csv", row.names = 1) |>
+#   # round for nicer display:
+#   mutate(across(where(is.numeric), ~round(., digits = 3))) |>
+#   # remove 0 allocation and defense row/column:
+#   slice(-1) |>
+#   select(-1)
 
-# allocation and turnover values for time series based on orthogonal/on axis values chosen from heatmap:
-alloc_runs <- c(40, 50, 70, 70, 80, 90, 100, 110, 120)
-turn_runs <- turnover_spread[c(3, 4, 6, 10, 9, 8, 7, 10, 11)]*100  # make percentage
+# # allocation and turnover values for time series based on orthogonal/on axis values chosen from heatmap:
+# alloc_runs <- c(30, 60, 70, 90, 110, 120, 160)
+# turn_runs <- turnover_spread[c(3, 4, 6, 10, 9, 8, 7, 10, 11)]*100  # make percentage
 
 
+### ARCHIVE ###
+# alloc_runs <- c(40, 50, 70, 70, 80, 90, 100, 110, 120)
+# turn_runs <- turnover_spread[c(3, 4, 6, 10, 9, 8, 7, 10, 11)]*100  # make percentage
