@@ -11,7 +11,7 @@ library(dplyr)
 ## load in functions:
 source("/projectnb/dietzelab/malmborg/PestDefense/00_PestED_Defoliation.R")
 
-## Prepare allocation, turnover parameters and initial values
+## Prepare initialization values
 # years:
 years = 5
 # annual defoliation events:
