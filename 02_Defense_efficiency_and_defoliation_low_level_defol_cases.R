@@ -182,14 +182,28 @@ density_plots[[3]] <- density + guides(color = "none") + theme(plot.title = elem
 
 
 ## making plots combining wood, leaf, density:
+# make a function for removing x-axis for combining plots:
+format_plot <- function(plot, x, title) {
+  if (x == 0 & title == 0){
+    plot + theme(axis.title.x = element_blank(),
+                 axis.text.x  = element_blank(),
+                 plot.title = element_blank())
+  } else if (x == 1 & title == 0){
+    plot + theme(plot.title = element_blank())
+  } else if (x == 0 & title == 1){
+    plot + theme(axis.title.x = element_blank(),
+                 axis.text.x  = element_blank())
+  }
+}
+
 # row labels:
 row_label_1 <- wrap_elements(panel = textGrob('5% Defoliation', rot=90, gp = gpar(fontsize = 14)))
 row_label_2 <- wrap_elements(panel = textGrob('10% Defoliation', rot=90, gp = gpar(fontsize = 14)))
 row_label_3 <- wrap_elements(panel = textGrob('15% Defoliation', rot=90, gp = gpar(fontsize = 14)))
 # combining plots:
-combined <- (row_label_1 + wood_plots[[1]] + leaf_plots[[1]] + density_plots[[1]] +
-             row_label_2 + wood_plots[[2]] + leaf_plots[[2]] + density_plots[[2]] +
-             row_label_3 + wood_plots[[3]] + leaf_plots[[3]] + density_plots[[3]]) + 
+combined <- (row_label_1 + format_plot(wood_plots[[1]],0,1) + format_plot(leaf_plots[[1]],0,1) + format_plot(density_plots[[1]],0,1) +
+             row_label_2 + format_plot(wood_plots[[2]],0,0) + format_plot(leaf_plots[[2]],0,0) + format_plot(density_plots[[2]],0,1) +
+             row_label_3 + format_plot(wood_plots[[3]],1,0) + format_plot(leaf_plots[[3]],1,0) + format_plot(density_plots[[3]],1,0)) + 
   plot_layout(ncol = 4, widths = c(0.5, 3, 3, 3), guides = "collect") & 
   theme(legend.position = "right",
         legend.text = element_text(size = 14),
