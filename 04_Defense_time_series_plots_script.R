@@ -5,6 +5,7 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(patchwork)
+library(grid)
 
 ## Functions for setting up data for time series
 # processing data function:
