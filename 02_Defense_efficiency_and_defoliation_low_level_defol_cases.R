@@ -1,6 +1,6 @@
 ### Script for testing defense efficiency and defoliation balance parameters ###
 
-# (1) Roll of defense allocation for low-lying annual defoliation 
+# (1) Role of defense allocation for low-lying annual defoliation 
 #  a) 5% defoliation with 0-1 defense efficiency
 #  b) 10% defoliation with 0-1 defense efficiency
 #  c) 15% defoliation with 0-1 defense efficiency
