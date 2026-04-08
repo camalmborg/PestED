@@ -1,9 +1,9 @@
-### Script for testing allocation and low=level defoliation ###
+### Script for testing allocation and low-level defoliation ###
 
 # (1) Role of defense allocation for low-lying annual defoliation 
-#  a) 5% defoliation with 0-1 defense efficiency
-#  b) 10% defoliation with 0-1 defense efficiency
-#  c) 15% defoliation with 0-1 defense efficiency
+#  a) 5% defoliation 
+#  b) 10% defoliation 
+#  c) 15% defoliation
 
 # consistent turnover, changing allocation
 # testing at two defense efficiencies (not at saturation)
@@ -20,7 +20,8 @@ years = 5
 # annual defoliation events:
 defol_days <- c(7000, 24520, 42040, 59560, 77080)
 # defense efficiency:
-def_eff <- c(0.65, 0.85)
+def_effs <- c(0.65, 0.85)
+def_eff <- def_effs[2]
 
 # allocation percent values to test:
 #defense_alloc_percent <- c(60, 70, 80, 90, 100, 110, 120)  # first runs
@@ -42,7 +43,7 @@ for (i in 1:length(defense_alloc_percent)){
   X[8] = X[1]*(0.175/365/86400*timestep)
   
   # set defense efficiency parameter:
-  params$defenseEfficiency = def_eff[2]
+  params$defenseEfficiency = def_eff
   
   # run the model for 5% defoliation:
   defol_5pc <- iterate.SEM(c(0,0,0.05,1,0), t.start = defol_days, years = years)
@@ -84,7 +85,8 @@ time_series_data <- SEM_plot_data_fx(alloc_defol_5pc_result) |>
 # model runs chosen for example plots:
 lines = c(1:length(defense_alloc_percent))
 # labels for lines:
-labels <- as.character(c(0.16, 0.19, 0.22, 0.25, 0.27, 0.30, 0.33))
+#labels <- as.character(c(0.16, 0.19, 0.22, 0.25, 0.27, 0.30, 0.33))
+labels <- as.character(c(0.03, 0.14, 0.25, 0.36, 0.47))
 
 # making plots:
 wood <- time_series_plot_fx(ts = time_series_data, cols = cols, var = 1, runs = lines, labels = labels)
@@ -101,7 +103,7 @@ combined <- (wood + leaf + store + density) +
 
 # save plots:
 save_dir <- "/projectnb/dietzelab/malmborg/Ch3_PestDefense/allocation_turnover/Figures/"
-png(filename = paste0(save_dir, Sys.Date(), "_5pc_annual_defol_def_eff_85_time_series_plots.png"),
+png(filename = paste0(save_dir, Sys.Date(), "_5pc_annual_defol_def_eff_", def_eff,"_time_series_plots.png"),
     height = 10, width = 15, units = "in", res = 600)
 combined
 dev.off()
@@ -136,7 +138,7 @@ combined <- (wood + leaf + store + density) +
 #combined
 
 # save plots:
-png(filename = paste0(save_dir, Sys.Date(), "_10pc_annual_defol_def_eff_85_time_series_plots.png"),
+png(filename = paste0(save_dir, Sys.Date(), "_10pc_annual_defol_def_eff_", def_eff,"_time_series_plots.png"),
     height = 10, width = 15, units = "in", res = 600)
 combined
 dev.off()
@@ -167,7 +169,7 @@ combined <- (wood + leaf + store + density) +
 #combined
 
 # save plots:
-png(filename = paste0(save_dir, Sys.Date(), "_15pc_annual_defol_def_eff_85_time_series_plots.png"),
+png(filename = paste0(save_dir, Sys.Date(), "_15pc_annual_defol_def_eff_", def_eff,"_time_series_plots.png"),
     height = 10, width = 15, units = "in", res = 600)
 combined
 dev.off()
@@ -208,7 +210,7 @@ combined <- (row_label_1 + format_plot(wood_plots[[1]],0,1) + format_plot(leaf_p
 #combined
 
 # save plots:
-png(filename = paste0(save_dir, Sys.Date(), "_all_annual_defol_def_eff_85_time_series_plots.png"),
+png(filename = paste0(save_dir, Sys.Date(), "_all_annual_defol_def_eff_", def_eff,"_time_series_plots.png"),
     height = 12, width = 16, units = "in", res = 600)
 combined
 dev.off()
