@@ -48,7 +48,7 @@ SEM_plot_data_fx <- function(output_list){
 #'@param cols = character vector, which columns from time series data you want, e.g. "Bleaf"
 #'@param var = character vector, which variable that is, e.g "Leaf Biomass"
 #'@param runs = numeric vector, which model runs you would like to include on plot, keeping number of lines 5 or less
-#'@param lables = character vector, legend labels
+#'@param labels = character vector, legend labels
 time_series_plot_fx <- function(ts, cols, var, runs, labels){
   time_series_data <- ts
   # set up plot data:
