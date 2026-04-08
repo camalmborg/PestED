@@ -115,11 +115,6 @@ time_series_data <- SEM_plot_data_fx(def_eff_defol_10pc_result) |>
   # add defense efficiency values for labeling:
   mutate(def_eff = def_eff[model_run])
 
-# model runs chosen for example plots:
-lines = c(1:5)
-# labels for lines:
-labels <- as.character(def_eff)
-
 # making plots:
 wood <- time_series_plot_fx(ts = time_series_data, cols = cols, var = 1, runs = lines, labels = labels)
 leaf <- time_series_plot_fx(ts = time_series_data, cols = cols, var = 2, runs = lines, labels = labels)
@@ -150,11 +145,6 @@ density_plots[[2]] <- density + guides(color = "none") + theme(plot.title = elem
 time_series_data <- SEM_plot_data_fx(def_eff_defol_15pc_result) |>
   # add defense efficiency values for labeling:
   mutate(def_eff = def_eff[model_run])
-
-# model runs chosen for example plots:
-lines = c(1:5)
-# labels for lines:
-labels <- as.character(def_eff)
 
 # making plots:
 wood <- time_series_plot_fx(ts = time_series_data, cols = cols, var = 1, runs = lines, labels = labels)
