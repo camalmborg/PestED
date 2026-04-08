@@ -214,3 +214,8 @@ png(filename = paste0(save_dir, Sys.Date(), "_all_outbreak_defol_def_eff_", def_
     height = 12, width = 16, units = "in", res = 600)
 combined
 dev.off()
+
+
+
+## Bar plots
+
