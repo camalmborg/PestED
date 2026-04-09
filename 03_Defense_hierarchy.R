@@ -10,11 +10,11 @@ source("/projectnb/dietzelab/malmborg/PestDefense/00_PestED_Defoliation.R")
 # years:
 years = 5   # used only 3 for outbreak case and 5 for ongoing defol case
 # annual defoliation events:
-#defol_days <- c(7000, 24520)   # for outbreak scenario
-defol_days <- c(7000, 24520, 42040, 59560, 77080)   # for low-level defoliation scenario
+defol_days <- c(7000, 24520)   # for outbreak scenario
+#defol_days <- c(7000, 24520, 42040, 59560, 77080)   # for low-level defoliation scenario
 # defol intensity:
 defol_intensities <- c(0.05, 0.1, 0.15, 0.5, 0.75, 1)
-defol_int <- defol_intensities[2]
+defol_int <- defol_intensities[6]
 
 # defense efficiency:
 def_effs <- c(0.65, 0.85)
@@ -115,9 +115,9 @@ row_label_1 <- wrap_elements(panel = textGrob('Low Allocation', rot=90, gp = gpa
 row_label_2 <- wrap_elements(panel = textGrob('Medium Allocation', rot=90, gp = gpar(fontsize = 14)))
 row_label_3 <- wrap_elements(panel = textGrob('High Allocation', rot=90, gp = gpar(fontsize = 14)))
 # combining plots:
-combined <- (row_label_1 + format_plot(wood_plots[[6]],0,1) + format_plot(leaf_plots[[6]],0,1) + format_plot(density_plots[[6]],0,1) +
-               row_label_2 + format_plot(wood_plots[[7]],0,0) + format_plot(leaf_plots[[7]],0,0) + format_plot(density_plots[[7]],0,0) +
-               row_label_3 + format_plot(wood_plots[[8]],1,0) + format_plot(leaf_plots[[8]],1,0) + format_plot(density_plots[[8]],1,0)) +
+combined <- (row_label_1 + format_plot(wood_plots[[4]],0,1) + format_plot(leaf_plots[[4]],0,1) + format_plot(density_plots[[4]],0,1) +
+               row_label_2 + format_plot(wood_plots[[5]],0,0) + format_plot(leaf_plots[[5]],0,0) + format_plot(density_plots[[5]],0,0) +
+               row_label_3 + format_plot(wood_plots[[6]],1,0) + format_plot(leaf_plots[[6]],1,0) + format_plot(density_plots[[6]],1,0)) +
   plot_layout(ncol = 4, widths = c(0.5, 3, 3, 3), guides = "collect") & 
   theme(legend.position = "right",
         legend.text = element_text(size = 14),
@@ -140,5 +140,4 @@ dev.off()
 # defense_plots <- list()
 # density_plots <- list()
 
-all_plots_defol_100 <- c(wood_plots, leaf_plots, store_plots, defense_plots, density_plots)
 
