@@ -214,3 +214,29 @@ png(filename = paste0(save_dir, Sys.Date(), "_all_annual_defol_def_eff_", def_ef
     height = 12, width = 16, units = "in", res = 600)
 combined
 dev.off()
+
+
+## Bar plots
+# process and combine outputs:
+bar_plot_data <- rbind(SEM_bar_data_fx(alloc_defol_5pc_result, group = "50%"),
+                       SEM_bar_data_fx(alloc_defol_10pc_result, group = "75%"),
+                       SEM_bar_data_fx(alloc_defol_15pc_result, group = "100%"))
+
+# labels specifying groups:
+labels <- as.character(c(0.03, 0.14, 0.25, 0.36, 0.47))
+# number of runs:
+lines = c(1:length(defense_alloc_percent))
+
+# make plots:
+wood <- SEM_bar_plot_fx(bar_plot_data, cols = cols, var = 1, runs = lines, labels = labels) +
+  labs(x = "Allocation")
+leaf <- SEM_bar_plot_fx(bar_plot_data, cols = cols, var = 2, runs = lines, labels = labels) +
+  labs(x = "Allocation")
+store <- SEM_bar_plot_fx(bar_plot_data, cols = cols, var = 3, runs = lines, labels = labels) +
+  labs(x = "Allocation")
+defense <- SEM_bar_plot_fx(bar_plot_data, cols = cols, var = 4, runs = lines, labels = labels) +
+  labs(x = "Allocation")
+density <- SEM_bar_plot_fx(bar_plot_data, cols = cols, var = 5, runs = lines, labels = labels) +
+  labs(x = "Allocation")
+
+

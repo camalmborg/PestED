@@ -238,5 +238,23 @@ store <- SEM_bar_plot_fx(bar_plot_data, cols = cols, var = 3, runs = lines, labe
 defense <- SEM_bar_plot_fx(bar_plot_data, cols = cols, var = 4, runs = lines, labels = labels) +
   labs(x = "Allocation")
 density <- SEM_bar_plot_fx(bar_plot_data, cols = cols, var = 5, runs = lines, labels = labels) +
-  labs(x = "Allocation")
+  labs(x = "Allocation") 
 
+
+# combining bar plots:
+combined <- (leaf + store + density) + 
+  plot_layout(ncol = 3, guides = "collect") & 
+  theme(plot.title = element_text(size = 12),
+        axis.title = element_text(size = 12),
+        legend.position = "right",
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 12),
+        axis.text = element_text(size = 12)) & guides(fill = guide_legend(title = "2-year Outbreak\nAnnual Defoliation"))
+#combined
+combined + plot_annotation(title = "Minimum Biomass and Tree Densities Experienced During Defoliator Outbreak Scenarios")
+
+# save bar plot:
+png(filename = paste0(save_dir, Sys.Date(), "_all_outbreak_defol_", def_eff,"_bar_plots.png"),
+    height = 4, width = 12, units = "in", res = 600)
+combined + plot_annotation(title = "Minimum Biomass and Tree Densities Experienced During Defoliator Outbreak Scenarios")
+dev.off()
