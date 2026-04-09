@@ -201,7 +201,7 @@ row_label_2 <- wrap_elements(panel = textGrob('10% Defoliation', rot=90, gp = gp
 row_label_3 <- wrap_elements(panel = textGrob('15% Defoliation', rot=90, gp = gpar(fontsize = 14)))
 # combining plots:
 combined <- (row_label_1 + format_plot(wood_plots[[1]],0,1) + format_plot(leaf_plots[[1]],0,1) + format_plot(density_plots[[1]],0,1) +
-               row_label_2 + format_plot(wood_plots[[2]],0,0) + format_plot(leaf_plots[[2]],0,0) + format_plot(density_plots[[2]],0,1) +
+               row_label_2 + format_plot(wood_plots[[2]],0,0) + format_plot(leaf_plots[[2]],0,0) + format_plot(density_plots[[2]],0,0) +
                row_label_3 + format_plot(wood_plots[[3]],1,0) + format_plot(leaf_plots[[3]],1,0) + format_plot(density_plots[[3]],1,0)) + 
   plot_layout(ncol = 4, widths = c(0.5, 3, 3, 3), guides = "collect") & 
   theme(legend.position = "right",
