@@ -15,7 +15,7 @@ P = 101.325 ## average atm pressure (kPa)
 ##' @param pest [phloem, xylem, leaf, root, stem]
 ##' @author Michael C, Dietze <dietze@bu.edu>
 ##' @return X 
-SEM <- function(X, params, inputs, pest, timestep = 1800, defense = 1){ 
+SEM <- function(X, params, inputs, pest, timestep = 1800, defense = defense){ 
   ## pest impacts:
   ## phloem feeders: % tax flux of carbon out of (GPP-Rl) and into Bstore
   ## xylem disruptors (bark beetle, canker, wilt, girdling): % decrease water supply 
@@ -152,6 +152,7 @@ SEM <- function(X, params, inputs, pest, timestep = 1800, defense = 1){
         Rg = Rg + (leafAlloc+rootAlloc)*params$Rg
       }
       
+      ## defense priority after leaf and stem growth
       if(defense == 2){
         if(X[4] > 0) {
           defenseAlloc = params$defenseAlloc * X[4]
@@ -172,7 +173,7 @@ SEM <- function(X, params, inputs, pest, timestep = 1800, defense = 1){
         Rg = Rg + growAlloc*params$Rg
       }
       
-      ## Defense
+      ## Defense priority last, after growth/reproduction
       if(defense == 3){
         if(X[4] > 0) {
           defenseAlloc = params$defenseAlloc * X[4]
@@ -302,6 +303,9 @@ X[2] = params$allomB0 * DBH^params$allomB1
 X[5] = 10
 X[7] = 700
 X[8] = X[1]*(0.175/365/86400*timestep)
+
+## Choose hierarchy (default = 1)
+defense = 1
 
 
 if(!exists('inputs')){
