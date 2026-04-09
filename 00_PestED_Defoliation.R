@@ -15,7 +15,7 @@ P = 101.325 ## average atm pressure (kPa)
 ##' @param pest [phloem, xylem, leaf, root, stem]
 ##' @author Michael C, Dietze <dietze@bu.edu>
 ##' @return X 
-SEM <- function(X, params, inputs, pest, timestep = 1800, defense = defense){ 
+SEM <- function(X, params, inputs, pest, timestep = 1800, dhierarch = dh){ 
   ## pest impacts:
   ## phloem feeders: % tax flux of carbon out of (GPP-Rl) and into Bstore
   ## xylem disruptors (bark beetle, canker, wilt, girdling): % decrease water supply 
@@ -126,8 +126,8 @@ SEM <- function(X, params, inputs, pest, timestep = 1800, defense = defense){
       Rg   = Rg   + rootAlloc*params$Rg
     }
     
-    ## Defense priority after minimum leaf and root
-    if(defense == 1){
+    ## Defense priority 1:
+    if(dhierarch == 1){
       if(X[4] > 0) {
         defenseAlloc = params$defenseAlloc * X[4]
         X[4] = X[4] - defenseAlloc
@@ -152,8 +152,8 @@ SEM <- function(X, params, inputs, pest, timestep = 1800, defense = defense){
         Rg = Rg + (leafAlloc+rootAlloc)*params$Rg
       }
       
-      ## defense priority after leaf and stem growth
-      if(defense == 2){
+      ## defense priority 2:
+      if(dhierarch == 2){
         if(X[4] > 0) {
           defenseAlloc = params$defenseAlloc * X[4]
           X[4] = X[4] - defenseAlloc
@@ -163,6 +163,7 @@ SEM <- function(X, params, inputs, pest, timestep = 1800, defense = defense){
 
       ## priority #7: Growth & reproduction
       if(X[4] > Smax){
+        
         growAlloc  = (X[4]-Smax)/(1+params$Rg)
         reproAlloc = growAlloc*params$Rfrac
         stemAlloc = growAlloc-reproAlloc
@@ -171,15 +172,16 @@ SEM <- function(X, params, inputs, pest, timestep = 1800, defense = defense){
         X[5] = X[5] + reproAlloc*params$SeedlingMort  ## bulk of reproductive allocation dies
         X[7] = X[7] + reproAlloc*(1-params$SeedlingMort)*X[7]/sum(X[1:4]) ## naive reproduction (new trees enter as adults)
         Rg = Rg + growAlloc*params$Rg
-      }
-      
-      ## Defense priority last, after growth/reproduction
-      if(defense == 3){
-        if(X[4] > 0) {
-          defenseAlloc = params$defenseAlloc * X[4]
-          X[4] = X[4] - defenseAlloc
-          X[8] = X[8] + defenseAlloc
+        
+        ## Defense priority 3:
+        if(dhierarch == 3){
+          if(X[4] > 0) {
+            defenseAlloc = params$defenseAlloc * X[4]
+            X[4] = X[4] - defenseAlloc
+            X[8] = X[8] + defenseAlloc
+          }
         }
+        
       }
       
     }  ## end Store > Smax
@@ -304,8 +306,8 @@ X[5] = 10
 X[7] = 700
 X[8] = X[1]*(0.175/365/86400*timestep)
 
-## Choose hierarchy (default = 1)
-defense = 1
+## Choose hierarchy (default = 2)
+dh = 2
 
 
 if(!exists('inputs')){
