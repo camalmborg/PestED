@@ -6,12 +6,6 @@ library(dplyr)
 ## Load functions
 source("/projectnb/dietzelab/malmborg/PestDefense/00_PestED_Defoliation.R")
 
-## Load libraries
-library(dplyr)
-
-## Load functions
-source("/projectnb/dietzelab/malmborg/PestDefense/00_PestED_Defoliation.R")
-
 ## Setting initial values and values for allocation and turnover
 # years:
 years = 5
@@ -40,7 +34,7 @@ min_bms <- as.matrix(data.frame(def_eff = def_eff,
 # loop:
 for (i in 1:length(def_eff)){
   # set param values:
-  params$defenseEfficiency = de_df$def_eff[i]
+  params$defenseEfficiency = def_eff[i]
   
   # run the model:
   defol_model_run <- iterate.SEM(c(0,0,1,1,0), t.start = defol_days, years = years)
@@ -55,3 +49,10 @@ for (i in 1:length(def_eff)){
   def_eff_sens[[name]] <- defol_model_run
   rm(defol_model_run, df)
 }
+
+test <- as.data.frame(min_bms)
+line <- lm(test$min_leaf ~ test$def_eff)
+coefs <- line$coefficients
+abline(a = coefs[1], b = coefs[2])
+
+
