@@ -115,10 +115,10 @@ row_label_1 <- wrap_elements(panel = textGrob('Low Allocation', rot=90, gp = gpa
 row_label_2 <- wrap_elements(panel = textGrob('Medium Allocation', rot=90, gp = gpar(fontsize = 14)))
 row_label_3 <- wrap_elements(panel = textGrob('High Allocation', rot=90, gp = gpar(fontsize = 14)))
 # combining plots:
-combined <- (row_label_1 + format_plot(wood_plots[[4]],0,1) + format_plot(leaf_plots[[4]],0,1) + format_plot(density_plots[[4]],0,1) +
-               row_label_2 + format_plot(wood_plots[[5]],0,0) + format_plot(leaf_plots[[5]],0,0) + format_plot(density_plots[[5]],0,0) +
-               row_label_3 + format_plot(wood_plots[[6]],1,0) + format_plot(leaf_plots[[6]],1,0) + format_plot(density_plots[[6]],1,0)) +
-  plot_layout(ncol = 4, widths = c(0.5, 3, 3, 3), guides = "collect") & 
+combined <- (row_label_1 + format_plot(wood_plots[[4]],0,1) + format_plot(leaf_plots[[4]],0,1) + format_plot(store_plots[[4]],0,1) + format_plot(density_plots[[4]],0,1) +
+               row_label_2 + format_plot(wood_plots[[5]],0,0) + format_plot(leaf_plots[[5]],0,0) + format_plot(store_plots[[5]],0,1) + format_plot(density_plots[[5]],0,0) +
+               row_label_3 + format_plot(wood_plots[[6]],1,0) + format_plot(leaf_plots[[6]],1,0) + format_plot(store_plots[[6]],1,0) + format_plot(density_plots[[6]],1,0)) +
+  plot_layout(ncol = 5, widths = c(0.5, 3, 3, 3, 3), guides = "collect") & 
   theme(legend.position = "right",
         legend.text = element_text(size = 14),
         legend.title = element_text(size = 14)) 
