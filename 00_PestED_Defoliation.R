@@ -15,7 +15,7 @@ P = 101.325 ## average atm pressure (kPa)
 ##' @param pest [phloem, xylem, leaf, root, stem]
 ##' @author Michael C, Dietze <dietze@bu.edu>
 ##' @return X 
-SEM <- function(X, params, inputs, pest, timestep = 1800, dhierarch = dh){ 
+SEM <- function(X, params, inputs, pest, timestep = 1800, defense = dh){ 
   ## pest impacts:
   ## phloem feeders: % tax flux of carbon out of (GPP-Rl) and into Bstore
   ## xylem disruptors (bark beetle, canker, wilt, girdling): % decrease water supply 
@@ -126,8 +126,8 @@ SEM <- function(X, params, inputs, pest, timestep = 1800, dhierarch = dh){
       Rg   = Rg   + rootAlloc*params$Rg
     }
     
-    ## Defense priority 1:
-    if(dhierarch == 1){
+    ## Defense priority after minimum leaf and root
+    if(defense == 1){
       if(X[4] > 0) {
         defenseAlloc = params$defenseAlloc * X[4]
         X[4] = X[4] - defenseAlloc
@@ -152,18 +152,16 @@ SEM <- function(X, params, inputs, pest, timestep = 1800, dhierarch = dh){
         Rg = Rg + (leafAlloc+rootAlloc)*params$Rg
       }
       
-      ## defense priority 2:
-      if(dhierarch == 2){
+      if(defense == 2){
         if(X[4] > 0) {
           defenseAlloc = params$defenseAlloc * X[4]
           X[4] = X[4] - defenseAlloc
           X[8] = X[8] + defenseAlloc
         }
       }
-
+      
       ## priority #7: Growth & reproduction
       if(X[4] > Smax){
-        
         growAlloc  = (X[4]-Smax)/(1+params$Rg)
         reproAlloc = growAlloc*params$Rfrac
         stemAlloc = growAlloc-reproAlloc
@@ -172,16 +170,15 @@ SEM <- function(X, params, inputs, pest, timestep = 1800, dhierarch = dh){
         X[5] = X[5] + reproAlloc*params$SeedlingMort  ## bulk of reproductive allocation dies
         X[7] = X[7] + reproAlloc*(1-params$SeedlingMort)*X[7]/sum(X[1:4]) ## naive reproduction (new trees enter as adults)
         Rg = Rg + growAlloc*params$Rg
-        
-        ## Defense priority 3:
-        if(dhierarch == 3){
-          if(X[4] > 0) {
-            defenseAlloc = params$defenseAlloc * X[4]
-            X[4] = X[4] - defenseAlloc
-            X[8] = X[8] + defenseAlloc
-          }
+      }
+      
+      ## Defense
+      if(defense == 3){
+        if(X[4] > 0) {
+          defenseAlloc = params$defenseAlloc * X[4]
+          X[4] = X[4] - defenseAlloc
+          X[8] = X[8] + defenseAlloc
         }
-        
       }
       
     }  ## end Store > Smax
@@ -306,8 +303,8 @@ X[5] = 10
 X[7] = 700
 X[8] = X[1]*(0.175/365/86400*timestep)
 
-## Choose hierarchy (default = 2)
-dh = 2
+## default hierarchy
+dh = 1
 
 
 if(!exists('inputs')){
@@ -373,27 +370,27 @@ plot.SEM <- function(output){
 }
 
 if(FALSE){
-
+  
   default = iterate.SEM(c(0,0,0,1,0), years = 5)
   plot.SEM(default)
   check <- default[,"Bdefense"]/(default[,"Bdefense"] + default[,"Bleaf"])
   plot(check)
-
+  
   defol = iterate.SEM(c(0,0,0.25,1,0), years = 5)  ## assume a one-time 100% defoliation
   plot.SEM(defol)
   check <- defol[,"Bdefense"]/(defol[,"Bdefense"] + defol[,"Bleaf"])
   plot(check)
-
+  
   plot.SEM(default-defol)
-
+  
   1-apply(default,2,min)/apply(default,2,max)
   1-apply(defol,2,min)/apply(defol,2,max)
-
+  
   L4 = read.csv("AMF_USMe2_2005_L4_h_V002.txt", header=TRUE, na.strings="-9999")
   L4[L4==-9999] = NA
-
+  
   default = as.data.frame(default)
-
+  
   ## GPP: model and observed
   GPP = default[,8]*default[,7]/10000  ## convert back to umol/m2/sec to compart to tower
   plot(GPP,type='l')
@@ -411,18 +408,19 @@ if(FALSE){
   plot(tod,GPP.mod.diurnal, ylim=ylim, col=2, xlab="Time of Day", ylab='GPP', main="Diurnal Cycle", type='l', lwd=3)
   lines(tod, GPP.obs.diurnal, lwd=3)
   legend("topleft", legend=c("obs","mod"), col=1:2, pch=20, cex=0.75)
-
+  
   ## RA & NPP (umol/sec/tree)
   RA = default$Rleaf + default$RstemRroot + default$Rgrow
   NPP = default[,8] - RA
   mean(NPP)/mean(default[,8])
   Rplant = apply(default[,c("Rleaf", "RstemRroot", "Rgrow")], 2, mean)
   Rplant/sum(Rplant)
-
+  
   ## woody increment
   DBH = (default$Bwood/params$allomB0)^(1/params$allomB1)  ## infer DBH from woody biomas
   plot(DBH)
   inc = DBH[length(DBH)]-DBH[1]
   inc
 }
+
 
